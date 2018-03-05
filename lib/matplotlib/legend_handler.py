@@ -35,6 +35,7 @@ import numpy as np
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle, FancyArrowPatch
 import matplotlib.collections as mcoll
+from matplotlib.text import Text, Annotation
 import matplotlib.colors as mcolors
 
 
@@ -649,11 +650,26 @@ class HandlerTuple(HandlerBase):
     pad : float, optional
         If None, fall back to ``legend.borderpad`` as the default.
         In units of fraction of font size. Default is None.
-    """
-    def __init__(self, ndivide=1, pad=None, **kwargs):
 
-        self._ndivide = ndivide
-        self._pad = pad
+
+    width_ratios : tuple, optional
+        The relative width of sections. Must be of length ndivide.
+        If None, all sections will have the same width. Default is None.
+    handlers : tuple, optionnal
+        The list of handlers to call for each section. Must be of length ndivide.
+        If None, the default handlers will be fetched automatically. Default is None.
+    """
+    def __init__(self, ndivide=1, pad=None, width_ratios=None, handlers=None, **kwargs):
+
+        self._ndivide  = ndivide
+        self._pad      = pad
+        self._handlers = handlers
+
+        if (width_ratios is not None) and (len(width_ratios) == ndivide):
+            self._width_ratios = width_ratios
+        else:
+            self._width_ratios = None
+
         HandlerBase.__init__(self, **kwargs)
 
     def create_artists(self, legend, orig_handle,
@@ -672,17 +688,32 @@ class HandlerTuple(HandlerBase):
         else:
             pad = self._pad * fontsize
 
-        if ndivide > 1:
-            width = (width - pad * (ndivide - 1)) / ndivide
+        if self._width_ratios is not None:
+            sumratios = sum(self._width_ratios)
+            widths = [(width - pad * (ndivide - 1)) * ratio / sumratios
+                      for ratio in self._width_ratios]
+        else:
+            widths = [(width - pad * (ndivide - 1)) / ndivide
+                      for _ in range(ndivide)]
+        widths_cycle = cycle(widths)
 
-        xds_cycle = cycle(xdescent - (width + pad) * np.arange(ndivide))
+        xds = [xdescent - (widths[-i-1] + pad) * i for i in range(ndivide)]
+        xds_cycle = cycle(xds)
 
         a_list = []
-        for handle1 in orig_handle:
-            handler = legend.get_legend_handler(handler_map, handle1)
-            _a_list = handler.create_artists(
-                legend, handle1,
-                next(xds_cycle), ydescent, width, height, fontsize, trans)
+        for i, handle1 in enumerate(orig_handle):
+            if self._handlers is not None:
+                handler = self._handlers[i]
+            else:
+                handler = legend.get_legend_handler(handler_map, handle1)
+
+            _a_list = handler.create_artists(legend, handle1,
+                                             six.next(xds_cycle),
+                                             ydescent,
+                                             six.next(widths_cycle),
+                                             height,
+                                             fontsize,
+                                             trans)
             a_list.extend(_a_list)
 
         return a_list
@@ -745,27 +776,94 @@ class HandlerFancyArrowPatch(HandlerPatch):
         return arrow
 
 
-class HandlerAnnotation(HandlerBase):
+class HandlerText(HandlerBase):
     """
-    Handler for Annotation instances.
-    Defers to HandlerFancyArrowPatch to draw the annotation arrow (if any).
+    Handler for Text instances.
+    Additional kwargs are passed through to `HandlerBase`.
+    Parameters
     ----------
-    pad : float, optional
-        If None, fall back to ``legend.borderpad`` as the default.
-        In units of fraction of font size. Default is None.
+    rep_str : string, optional
+        Replacement string used in the legend when the Text string is longer than rep_maxlen.
+        Default is 'Aa'.
+    rep_maxlen : int, optional
+        Maximum length of Text string to be used in the legend. Default is 2.
     """
-    def __init__(self, pad=None):
+    def __init__(self, rep_str='Aa', rep_maxlen=2, **kwargs):
 
-        self._pad = pad
+        self._rep_str    = rep_str
+        self._rep_maxlen = rep_maxlen
 
-        HandlerBase.__init__(self)
+        HandlerBase.__init__(self, **kwargs)
 
     def create_artists(self, legend, orig_handle,
                        xdescent, ydescent, width, height, fontsize, trans):
-        # Fancy arrow handler
-        if orig_handle.arrow_patch is not None:
+        # Use original text if it is short
+        text = orig_handle.get_text()
+        if len(text) > self._rep_maxlen:
+            text = self._rep_str
+
+        # Use smaller fontsize for text repr
+        text_fontsize = 2 * fontsize / 3
+
+        t = Text(x=-xdescent + width / 2 - len(text) * text_fontsize / 4,
+                 y=-ydescent + height / 4,
+                 text=text)
+
+        # Copy text attributes, except fontsize
+        self.update_prop(t, orig_handle, legend)
+        t.set_transform(trans)
+        t.set_fontsize(text_fontsize)
+
+        return [t]
+
+
+class HandlerAnnotation(HandlerText):
+    """
+    Handler for Annotation instances.
+    Defers to HandlerText to draw the annotation text (if any).
+    Defers to HandlerFancyArrowPatch to draw the annotation arrow (if any).
+    For annotations made of both text and arrow, HandlerTuple is used to draw them side by side.
+    Additional kwargs are passed through to `HandlerText`.
+    Parameters
+    ----------
+    pad : float, optional
+        If None, fall back to `legend.borderpad` asstr the default.
+        In units of fraction of font size. Default is None.
+    width_ratios : tuple, optional
+        The relative width of text and arrow sections. Must be of length 2.
+        Default is [1,4].
+    """
+    def __init__(self, pad=None, width_ratios=[1,4], **kwargs):
+
+        self._pad          = pad
+        self._width_ratios = width_ratios
+
+        HandlerText.__init__(self, **kwargs)
+
+    def create_artists(self, legend, orig_handle,
+                       xdescent, ydescent, width, height, fontsize, trans):
+        if (orig_handle.arrow_patch is not None) and (orig_handle.get_text() is not ""):
+            # Draw a tuple (text, arrow)
+            handler = HandlerTuple(ndivide=2, pad=self._pad, width_ratios=self._width_ratios,
+                                    handlers=[HandlerText(rep_str=self._rep_str,
+                                                          rep_maxlen=self._rep_maxlen),
+                                              HandlerFancyArrowPatch()])
+            # Create a Text instance from annotation text
+            text_handle = Text(text=orig_handle.get_text())
+            text_handle.update_from(orig_handle)
+            handle  = (text_handle, orig_handle.arrow_patch)
+        elif orig_handle.arrow_patch is not None:
+            # Arrow without text
             handler = HandlerFancyArrowPatch()
-            handle = orig_handle.arrow_patch
+            handle  = orig_handle.arrow_patch
+        elif orig_handle.get_text() is not "":
+            # Text without arrow
+            handler = HandlerText(rep_str=self._rep_str, rep_maxlen=self._rep_maxlen)
+            handle  = orig_handle
+        else:
+            # No text, no arrow
+            handler = HandlerPatch()
+            handle  = Rectangle(xy=[0, 0], width=0, height=0, color='w', alpha=0.0)
 
         return handler.create_artists(legend, handle,
                                        xdescent, ydescent,
