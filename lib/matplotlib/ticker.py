@@ -1388,9 +1388,9 @@ class PercentFormatter(Formatter):
         """
         The configured percent symbol as a string.
 
-        If LaTeX is enabled via ``rcParams['text.usetex']``, the special
-        characters `{'#', '$', '%', '&', '~', '_', '^', '\\', '{', '}'}`
-        are automatically escaped in the string.
+        If LaTeX is enabled via :rc:`text.usetex`, the special characters
+        ``{'#', '$', '%', '&', '~', '_', '^', '\\', '{', '}'}`` are
+        automatically escaped in the string.
         """
         symbol = self._symbol
         if not symbol:
@@ -1819,14 +1819,13 @@ class MaxNLocator(Locator):
 
         *prune*
             ['lower' | 'upper' | 'both' | None]
-            Remove edge ticks -- useful for stacked or ganged plots
-            where the upper tick of one axes overlaps with the lower
-            tick of the axes above it, primarily when
-            `rcParams['axes.autolimit_mode']` is `'round_numbers'`.
-            If `prune=='lower'`, the smallest tick will
-            be removed.  If `prune=='upper'`, the largest tick will be
-            removed.  If `prune=='both'`, the largest and smallest ticks
-            will be removed.  If `prune==None`, no ticks will be removed.
+            Remove edge ticks -- useful for stacked or ganged plots where
+            the upper tick of one axes overlaps with the lower tick of the
+            axes above it, primarily when :rc:`axes.autolimit_mode` is
+            ``'round_numbers'``.  If ``prune=='lower'``, the smallest tick will
+            be removed.  If ``prune == 'upper'``, the largest tick will be
+            removed.  If ``prune == 'both'``, the largest and smallest ticks
+            will be removed.  If ``prune == None``, no ticks will be removed.
 
         *min_n_ticks*
             Relax `nbins` and `integer` constraints if necessary to
@@ -1922,7 +1921,7 @@ class MaxNLocator(Locator):
                 step = steps[istep]
                 best_vmin = (_vmin // step) * step
                 best_vmax = best_vmin + step * nbins
-                if (best_vmax >= _vmax):
+                if best_vmax >= _vmax:
                     break
 
         # This is an upper limit; move to smaller steps if necessary.

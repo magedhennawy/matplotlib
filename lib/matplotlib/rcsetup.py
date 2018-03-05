@@ -24,26 +24,25 @@ import os
 import warnings
 import re
 
-from matplotlib import cbook
+from matplotlib import cbook, testing
 from matplotlib.cbook import mplDeprecation, deprecated, ls_mapper
 from matplotlib.fontconfig_pattern import parse_fontconfig_pattern
 from matplotlib.colors import is_color_like
 
-
 # Don't let the original cycler collide with our validating cycler
 from cycler import Cycler, cycler as ccycler
 
-# interactive_bk = ['gtk', 'gtkagg', 'gtkcairo', 'qt4agg',
-#                  'tkagg', 'wx', 'wxagg', 'webagg']
+
 # The capitalized forms are needed for ipython at present; this may
 # change for later versions.
-
-interactive_bk = ['GTK', 'GTKAgg', 'GTKCairo', 'MacOSX',
-                  'Qt4Agg', 'Qt5Agg', 'TkAgg', 'WX', 'WXAgg',
-                  'GTK3Cairo', 'GTK3Agg', 'WebAgg', 'nbAgg']
-
-
-non_interactive_bk = ['agg', 'cairo', 'gdk',
+interactive_bk = ['GTK3Agg', 'GTK3Cairo',
+                  'MacOSX',
+                  'nbAgg',
+                  'Qt4Agg', 'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo',
+                  'TkAgg', 'TkCairo',
+                  'WebAgg',
+                  'WX', 'WXAgg', 'WXCairo']
+non_interactive_bk = ['agg', 'cairo',
                       'pdf', 'pgf', 'ps', 'svg', 'template']
 all_backends = interactive_bk + non_interactive_bk
 
@@ -266,19 +265,15 @@ def validate_backend(s):
         return _validate_standard_backends(s)
 
 
-@deprecated("2.2",
-            "The backend.qt4 rcParam was deprecated in version 2.2.  In order "
-            "to force the use of a specific Qt4 binding, either import that "
-            "binding first, or set the QT_API environment variable.")
 def validate_qt4(s):
+    if s is None:
+        return None
     return ValidateInStrings("backend.qt4", ['PyQt4', 'PySide', 'PyQt4v2'])(s)
 
 
-@deprecated("2.2",
-            "The backend.qt5 rcParam was deprecated in version 2.2.  In order "
-            "to force the use of a specific Qt5 binding, either import that "
-            "binding first, or set the QT_API environment variable.")
 def validate_qt5(s):
+    if s is None:
+        return None
     return ValidateInStrings("backend.qt5", ['PyQt5', 'PySide2'])(s)
 
 
@@ -539,26 +534,6 @@ validate_fillstylelist = _listify_validator(validate_fillstyle)
 _validate_negative_linestyle = ValidateInStrings('negative_linestyle',
                                                  ['solid', 'dashed'],
                                                  ignorecase=True)
-
-
-@deprecated('2.1',
-            addendum=(" See 'validate_negative_linestyle_legacy' " +
-                      "deprecation warning for more information."))
-def validate_negative_linestyle(s):
-    return _validate_negative_linestyle(s)
-
-
-@deprecated('2.1',
-            addendum=(" The 'contour.negative_linestyle' rcParam now " +
-                      "follows the same validation as the other rcParams " +
-                      "that are related to line style."))
-def validate_negative_linestyle_legacy(s):
-    try:
-        res = validate_negative_linestyle(s)
-        return res
-    except ValueError:
-        dashes = validate_nseq_float(2)(s)
-        return (0, dashes)  # (offset, (solid, blank))
 
 
 validate_legend_loc = ValidateInStrings(
@@ -949,8 +924,8 @@ defaultParams = {
     'backend':           ['Agg', validate_backend],  # agg is certainly
                                                       # present
     'backend_fallback':  [True, validate_bool],  # agg is certainly present
-    'backend.qt4':       ['PyQt4', validate_qt4],
-    'backend.qt5':       ['PyQt5', validate_qt5],
+    'backend.qt4':       [None, validate_qt4],
+    'backend.qt5':       [None, validate_qt5],
     'webagg.port':       [8988, validate_int],
     'webagg.address':    ['127.0.0.1', validate_webagg_address],
     'webagg.open_in_browser': [True, validate_bool],
@@ -1226,6 +1201,8 @@ defaultParams = {
     # tick properties
     'xtick.top':         [False, validate_bool],   # draw ticks on the top side
     'xtick.bottom':      [True, validate_bool],   # draw ticks on the bottom side
+    'xtick.labeltop':    [False, validate_bool],  # draw label on the top
+    'xtick.labelbottom': [True, validate_bool],  # draw label on the bottom
     'xtick.major.size':  [3.5, validate_float],    # major xtick size in points
     'xtick.minor.size':  [2, validate_float],    # minor xtick size in points
     'xtick.major.width': [0.8, validate_float],  # major xtick width in points
@@ -1246,6 +1223,8 @@ defaultParams = {
 
     'ytick.left':        [True, validate_bool],  # draw ticks on the left side
     'ytick.right':       [False, validate_bool],  # draw ticks on the right side
+    'ytick.labelleft':   [True, validate_bool],  # draw tick labels on the left side
+    'ytick.labelright':  [False, validate_bool],  # draw tick labels on the right side
     'ytick.major.size':  [3.5, validate_float],     # major ytick size in points
     'ytick.minor.size':  [2, validate_float],     # minor ytick size in points
     'ytick.major.width': [0.8, validate_float],   # major ytick width in points
@@ -1297,6 +1276,19 @@ defaultParams = {
                                                      closedmax=False)],
     'figure.subplot.hspace': [0.2, ValidateInterval(0, 1, closedmin=True,
                                                      closedmax=False)],
+
+    # do constrained_layout.
+    'figure.constrained_layout.use': [False, validate_bool],
+    # wspace and hspace are fraction of adjacent subplots to use
+    # for space.  Much smaller than above because we don't need
+    # room for the text.
+    'figure.constrained_layout.hspace': [0.02, ValidateInterval(
+            0, 1, closedmin=True, closedmax=False)],
+    'figure.constrained_layout.wspace': [0.02, ValidateInterval(
+            0, 1, closedmin=True, closedmax=False)],
+    # This is a buffer around the axes in inches.  This is 3pts.
+    'figure.constrained_layout.h_pad': [0.04167, validate_float],
+    'figure.constrained_layout.w_pad': [0.04167, validate_float],
 
     ## Saving figure's properties
     'savefig.dpi':         ['figure', validate_dpi],  # DPI

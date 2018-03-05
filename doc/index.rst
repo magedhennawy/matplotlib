@@ -18,7 +18,7 @@ interface toolkits.
           border="0" alt="screenshots"/>
          </div>
          <div class="responsive_subfig">
-         <img align="middle" src="_images/sphx_glr_histogram_thumb1.png"
+         <img align="middle" src="_images/sphx_glr_histogram_thumb.png"
           border="0" alt="screenshots"/>
          </div>
          <div class="responsive_subfig">
@@ -185,7 +185,7 @@ the Numfocus organization or to the `John Hunter Technology Fellowship
 <jdh-fellowship_>`_.
 
 .. _donating: https://www.flipcause.com/secure/cause_pdetails/MjI1OA==
-.. _jdh-fellowship: http://numfocus.org/johnhunter/
+.. _jdh-fellowship: https://www.numfocus.org/programs/john-hunter-technology-fellowship/
 
 The :doc:`Matplotlib license <users/license>` is based on the `Python Software
 Foundation (PSF) license <psf-license_>`_.

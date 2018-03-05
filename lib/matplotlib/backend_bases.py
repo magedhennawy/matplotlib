@@ -36,7 +36,6 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import six
-from six.moves import xrange
 
 from contextlib import contextmanager
 from functools import partial
@@ -440,7 +439,7 @@ class RendererBase(object):
             return
 
         transform = transforms.IdentityTransform()
-        for i in xrange(N):
+        for i in range(N):
             path = paths[i % Npaths]
             if Ntransforms:
                 transform = Affine2D(all_transforms[i % Ntransforms])
@@ -518,7 +517,7 @@ class RendererBase(object):
             gc0.set_linewidth(0.0)
 
         xo, yo = 0, 0
-        for i in xrange(N):
+        for i in range(N):
             path_id = path_ids[i % Npaths]
             if Noffsets:
                 xo, yo = toffsets[i % Noffsets]
@@ -955,14 +954,6 @@ class GraphicsContextBase(object):
         """
         return self._joinstyle
 
-    @cbook.deprecated("2.1")
-    def get_linestyle(self):
-        """
-        Return the linestyle: one of ('solid', 'dashed', 'dashdot',
-        'dotted').
-        """
-        return self._linestyle
-
     def get_linewidth(self):
         """
         Return the line width in points as a scalar
@@ -1105,17 +1096,6 @@ class GraphicsContextBase(object):
         Set the linewidth in points
         """
         self._linewidth = float(w)
-
-    @cbook.deprecated("2.1")
-    def set_linestyle(self, style):
-        """
-        Set the linestyle to be one of ('solid', 'dashed', 'dashdot',
-        'dotted'). These are defined in the rcParams
-        `lines.dashed_pattern`, `lines.dashdot_pattern` and
-        `lines.dotted_pattern`.  One may also specify customized dash
-        styles by providing a tuple of (offset, dash pairs).
-        """
-        self._linestyle = style
 
     def set_url(self, url):
         """
@@ -1405,14 +1385,6 @@ class Event(object):
         self.name = name
         self.canvas = canvas
         self.guiEvent = guiEvent
-
-
-@cbook.deprecated("2.1")
-class IdleEvent(Event):
-    """
-    An event triggered by the GUI backend when it is idle -- useful
-    for passive animation
-    """
 
 
 class DrawEvent(Event):
@@ -2011,16 +1983,15 @@ class FigureCanvasBase(object):
         if xy is not None:
             x, y = xy
             self._lastx, self._lasty = x, y
+        else:
+            x = None
+            y = None
+            cbook.warn_deprecated('3.0', 'enter_notify_event expects a '
+                                         'location but '
+                                 'your backend did not pass one.')
 
-        event = Event('figure_enter_event', self, guiEvent)
+        event = LocationEvent('figure_enter_event', self, x, y, guiEvent)
         self.callbacks.process('figure_enter_event', event)
-
-    @cbook.deprecated("2.1")
-    def idle_event(self, guiEvent=None):
-        """Called when GUI is idle."""
-        s = 'idle_event'
-        event = IdleEvent(s, self, guiEvent=guiEvent)
-        self.callbacks.process(s, event)
 
     def grab_mouse(self, ax):
         """
@@ -2084,27 +2055,25 @@ class FigureCanvasBase(object):
             groupings[name].sort()
         return groupings
 
-    def _get_output_canvas(self, format):
-        """Return a canvas that is suitable for saving figures to a specified
-        file format. If necessary, this function will switch to a registered
-        backend that supports the format.
+    def _get_output_canvas(self, fmt):
         """
-        method_name = 'print_%s' % format
+        Return a canvas suitable for saving figures to a specified file format.
 
-        # check if this canvas supports the requested format
+        If necessary, this function will switch to a registered backend that
+        supports the format.
+        """
+        method_name = 'print_%s' % fmt
+        # Return the current canvas if it supports the requested format.
         if hasattr(self, method_name):
             return self
-
-        # check if there is a default canvas for the requested format
-        canvas_class = get_registered_canvas_class(format)
+        # Return a default canvas for the requested format, if it exists.
+        canvas_class = get_registered_canvas_class(fmt)
         if canvas_class:
             return self.switch_backends(canvas_class)
-
-        # else report error for unsupported format
-        formats = sorted(self.get_supported_filetypes())
-        raise ValueError('Format "%s" is not supported.\n'
-                         'Supported formats: '
-                         '%s.' % (format, ', '.join(formats)))
+        # Else report error for unsupported format.
+        raise ValueError(
+            "Format {!r} is not supported (supported formats: {})"
+            .format(fmt, ", ".join(sorted(self.get_supported_filetypes()))))
 
     def print_figure(self, filename, dpi=None, facecolor=None, edgecolor=None,
                      orientation='portrait', format=None, **kwargs):
@@ -2817,10 +2786,6 @@ class NavigationToolbar2(object):
         self.set_history_buttons()
         self._update_view()
 
-    @cbook.deprecated("2.1", alternative="canvas.draw_idle")
-    def dynamic_update(self):
-        self.canvas.draw_idle()
-
     def draw_rubberband(self, event, x0, y0, x1, y1):
         """Draw a rectangle rubberband to indicate zoom limits.
 
@@ -3159,8 +3124,8 @@ class NavigationToolbar2(object):
         for ax, (view, (pos_orig, pos_active)) in items:
             ax._set_view(view)
             # Restore both the original and modified positions
-            ax.set_position(pos_orig, 'original')
-            ax.set_position(pos_active, 'active')
+            ax._set_position(pos_orig, 'original')
+            ax._set_position(pos_active, 'active')
         self.canvas.draw_idle()
 
     def save_figure(self, *args):

@@ -23,7 +23,6 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import six
-from six.moves import xrange
 
 import warnings
 
@@ -276,16 +275,51 @@ class Table(Artist):
         self.set_clip_on(False)
 
     def add_cell(self, row, col, *args, **kwargs):
-        """ Add a cell to the table. """
-        xy = (0, 0)
+        """
+        Add a cell to the table.
 
+        Parameters
+        ----------
+        row : int
+            Row index
+        col : int
+            Column index
+
+        Returns
+        -------
+        `CustomCell`: Automatically created cell
+
+        """
+        xy = (0, 0)
         cell = CustomCell(xy, visible_edges=self.edges, *args, **kwargs)
+        self[row, col] = cell
+        return cell
+
+    def __setitem__(self, position, cell):
+        """
+        Set a customcell in a given position
+        """
+        if not isinstance(cell, CustomCell):
+            raise TypeError('Table only accepts CustomCell')
+        try:
+            row, col = position[0], position[1]
+        except Exception:
+            raise KeyError('Only tuples length 2 are accepted as coordinates')
         cell.set_figure(self.figure)
         cell.set_transform(self.get_transform())
-
         cell.set_clip_on(False)
         self._cells[row, col] = cell
         self.stale = True
+
+    def __getitem__(self, position):
+        """
+        Retreive a custom cell from a given position
+        """
+        try:
+            row, col = position[0], position[1]
+        except Exception:
+            raise KeyError('Only tuples length 2 are accepted as coordinates')
+        return self._cells[row, col]
 
     @property
     def edges(self):
@@ -516,7 +550,7 @@ class Table(Artist):
         else:
             # Position using loc
             (BEST, UR, UL, LL, LR, CL, CR, LC, UC, C,
-             TR, TL, BL, BR, R, L, T, B) = xrange(len(self.codes))
+             TR, TL, BL, BR, R, L, T, B) = range(len(self.codes))
             # defaults for center
             ox = (0.5 - w / 2) - l
             oy = (0.5 - h / 2) - b
@@ -635,8 +669,8 @@ def table(ax,
     height = table._approx_text_height()
 
     # Add the cells
-    for row in xrange(rows):
-        for col in xrange(cols):
+    for row in range(rows):
+        for col in range(cols):
             table.add_cell(row + offset, col,
                            width=colWidths[col], height=height,
                            text=cellText[row][col],
@@ -644,7 +678,7 @@ def table(ax,
                            loc=cellLoc)
     # Do column labels
     if colLabels is not None:
-        for col in xrange(cols):
+        for col in range(cols):
             table.add_cell(0, col,
                            width=colWidths[col], height=height,
                            text=colLabels[col], facecolor=colColours[col],
@@ -652,7 +686,7 @@ def table(ax,
 
     # Do row labels
     if rowLabels is not None:
-        for row in xrange(rows):
+        for row in range(rows):
             table.add_cell(row + offset, -1,
                            width=rowLabelWidth or 1e-15, height=height,
                            text=rowLabels[row], facecolor=rowColours[row],

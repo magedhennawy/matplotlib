@@ -6,10 +6,8 @@ Embedding In Wx4
 An example of how to use wx or wxagg in an application with a custom toolbar.
 """
 
-import matplotlib
-matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
-from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg
+from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 from matplotlib.backends.backend_wx import _load_bitmap
 from matplotlib.figure import Figure
 
@@ -18,14 +16,14 @@ import numpy as np
 import wx
 
 
-class MyNavigationToolbar(NavigationToolbar2WxAgg):
+class MyNavigationToolbar(NavigationToolbar):
     """
     Extend the default wx toolbar with your own event handlers
     """
     ON_CUSTOM = wx.NewId()
 
     def __init__(self, canvas, cankill):
-        NavigationToolbar2WxAgg.__init__(self, canvas)
+        NavigationToolbar.__init__(self, canvas)
 
         # for simplicity I'm going to reuse a bitmap from wx, you'll
         # probably want to add your own.
@@ -74,8 +72,6 @@ class CanvasFrame(wx.Frame):
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.canvas, 1, wx.TOP | wx.LEFT | wx.EXPAND)
-        # Capture the paint message
-        self.Bind(wx.EVT_PAINT, self.OnPaint)
 
         self.toolbar = MyNavigationToolbar(self.canvas, True)
         self.toolbar.Realize()
@@ -87,10 +83,6 @@ class CanvasFrame(wx.Frame):
         self.toolbar.update()
         self.SetSizer(self.sizer)
         self.Fit()
-
-    def OnPaint(self, event):
-        self.canvas.draw()
-        event.Skip()
 
 
 class App(wx.App):

@@ -45,7 +45,6 @@ requirements that are needed to build the documentation. They are listed in
 * Sphinx>=1.3, !=1.5.0, !=1.6.4
 * colorspacious
 * IPython
-* mock
 * numpydoc>=0.4
 * Pillow
 * sphinx-gallery>=0.1.12
@@ -276,27 +275,20 @@ tutorial in :doc:`/tutorials/introductory/customizing`::
 
     .. literalinclude:: ../../_static/matplotlibrc
 
-This is rendered as :doc:`/tutorials/introductory/customizing` (see the
-bottom of the page.  Note that this is in a tutorial;  See
-:ref:`writing-examples-and-tutorials` below)
+This is rendered at the bottom of :doc:`/tutorials/introductory/customizing`.
+Note that this is in a tutorial; see :ref:`writing-examples-and-tutorials`
+below.
 
-In the top level :file:`doc` directory there are symlinks pointing to the
-Matplotlib :file:`examples`:
-
-.. code-block:: sh
-
-    home:~/mpl/doc> ls -l mpl_*
-    mpl_examples -> ../examples
-
-Plots are included from the examples dir using the symlink:
+The examples directory is also copied to :file:`doc/gallery` by sphinx-gallery,
+so plots from the examples directory can be included using
 
 .. code-block:: rst
 
-    .. plot:: mpl_examples/pylab_examples/simple_plot.py
+    .. plot:: gallery/pylab_examples/simple_plot.py
 
-Note that the python script that generates the plot is referred to, rather
-than any plot that is created.  `Sphinx Gallery`_ will provide the incorrect
-reference when the documentation is built.
+Note that the python script that generates the plot is referred to, rather than
+any plot that is created.  Sphinx-gallery will provide the correct reference
+when the documentation is built.
 
 
 .. _writing-docstrings:
@@ -410,13 +402,14 @@ to keep in mind:
      -------
      lines : `~matplotlib.collections.LineCollection`
 
+* rcParams can be referenced with the custom ``:rc:`` role:
+  :literal:`:rc:\`foo\`` yields ``rcParams["foo"]``.
 
 Deprecated formatting conventions
 ---------------------------------
 * Formerly, we have used square brackets for explicit parameter lists
   ``['solid' | 'dashed' | 'dotted']``. With numpydoc we have switched to their
   standard using curly braces ``{'solid', 'dashed', 'dotted'}``.
-
 
 Linking to other code
 ---------------------

@@ -259,7 +259,7 @@ class ScalarMappable(object):
                         xx = (xx * 255).astype(np.uint8)
                 elif xx.dtype == np.uint8:
                     if not bytes:
-                        xx = xx.astype(float) / 255
+                        xx = xx.astype(np.float32) / 255
                 else:
                     raise ValueError("Image RGB array must be uint8 or "
                                      "floating point; found %s" % xx.dtype)
@@ -305,7 +305,8 @@ class ScalarMappable(object):
         sequence, interpret it as ``(vmin, vmax)`` which is used to
         support setp
 
-        ACCEPTS: a length 2 sequence of floats
+        ACCEPTS: a length 2 sequence of floats; may be overridden in methods
+        that have ``vmin`` and ``vmax`` kwargs.
         """
         if vmax is None:
             try:
@@ -331,11 +332,11 @@ class ScalarMappable(object):
     def set_norm(self, norm):
         """Set the normalization instance.
 
-        .. ACCEPTS: `~.Normalize`
+        .. ACCEPTS: `.Normalize`
 
         Parameters
         ----------
-        norm : `~.Normalize`
+        norm : `.Normalize`
         """
         if norm is None:
             norm = colors.Normalize()

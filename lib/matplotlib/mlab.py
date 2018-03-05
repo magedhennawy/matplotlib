@@ -151,14 +151,6 @@ Example usage::
 
     rec2excel(r, 'test.xls', formatd=formatd)
     rec2csv(r, 'test.csv', formatd=formatd)
-    scroll = rec2gtk(r, formatd=formatd)
-
-    win = gtk.Window()
-    win.set_size_request(600,800)
-    win.add(scroll)
-    win.show_all()
-    gtk.main()
-
 
 """
 
@@ -166,7 +158,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import six
-from six.moves import map, xrange, zip
+from six.moves import map, zip
 
 import copy
 import csv
@@ -186,20 +178,13 @@ if six.PY3:
     long = int
 
 
+@cbook.deprecated("2.2", alternative='numpy.logspace or numpy.geomspace')
 def logspace(xmin, xmax, N):
     '''
     Return N values logarithmically spaced between xmin and xmax.
 
     '''
     return np.exp(np.linspace(np.log(xmin), np.log(xmax), N))
-
-
-def _norm(x):
-    '''
-    Return sqrt(x dot x).
-
-    '''
-    return np.sqrt(np.dot(x, x))
 
 
 def window_hanning(x):
@@ -1348,10 +1333,12 @@ def cohere(x, y, NFFT=256, Fs=2, detrend=detrend_none, window=window_hanning,
     return Cxy, f
 
 
+@cbook.deprecated('2.2')
 def donothing_callback(*args):
     pass
 
 
+@cbook.deprecated('2.2', 'scipy.signal.coherence')
 def cohere_pairs(X, ij, NFFT=256, Fs=2, detrend=detrend_none,
                  window=window_hanning, noverlap=0,
                  preferSpeedOverMemory=True,
@@ -1458,7 +1445,7 @@ def cohere_pairs(X, ij, NFFT=256, Fs=2, detrend=detrend_none,
         windowVals = window
     else:
         windowVals = window(np.ones(NFFT, X.dtype))
-    ind = list(xrange(0, numRows-NFFT+1, NFFT-noverlap))
+    ind = list(range(0, numRows-NFFT+1, NFFT-noverlap))
     numSlices = len(ind)
     FFTSlices = {}
     FFTConjSlices = {}
@@ -1509,6 +1496,7 @@ def cohere_pairs(X, ij, NFFT=256, Fs=2, detrend=detrend_none,
         return Cxy, Phase, freqs
 
 
+@cbook.deprecated('2.2', 'scipy.stats.entropy')
 def entropy(y, bins):
     r"""
     Return the entropy of the data in *y* in units of nat.
@@ -1538,18 +1526,21 @@ def entropy(y, bins):
     return S
 
 
+@cbook.deprecated('2.2', 'scipy.stats.norm.pdf')
 def normpdf(x, *args):
     "Return the normal pdf evaluated at *x*; args provides *mu*, *sigma*"
     mu, sigma = args
     return 1./(np.sqrt(2*np.pi)*sigma)*np.exp(-0.5 * (1./sigma*(x - mu))**2)
 
 
+@cbook.deprecated('2.2')
 def find(condition):
     "Return the indices where ravel(condition) is true"
     res, = np.nonzero(np.ravel(condition))
     return res
 
 
+@cbook.deprecated('2.2')
 def longest_contiguous_ones(x):
     """
     Return the indices of the longest stretch of contiguous ones in *x*,
@@ -1577,11 +1568,13 @@ def longest_contiguous_ones(x):
     return ind
 
 
+@cbook.deprecated('2.2')
 def longest_ones(x):
     '''alias for longest_contiguous_ones'''
     return longest_contiguous_ones(x)
 
 
+@cbook.deprecated('2.2')
 class PCA(object):
     def __init__(self, a, standardize=True):
         """
@@ -1717,6 +1710,7 @@ class PCA(object):
         return a
 
 
+@cbook.deprecated('2.2', 'numpy.percentile')
 def prctile(x, p=(0.0, 25.0, 50.0, 75.0, 100.0)):
     """
     Return the percentiles of *x*.  *p* can either be a sequence of
@@ -1756,6 +1750,7 @@ def prctile(x, p=(0.0, 25.0, 50.0, 75.0, 100.0)):
     return _interpolate(values[ai], values[bi], frac)
 
 
+@cbook.deprecated('2.2')
 def prctile_rank(x, p):
     """
     Return the rank for each element in *x*, return the rank
@@ -1781,6 +1776,7 @@ def prctile_rank(x, p):
     return np.searchsorted(ptiles, x)
 
 
+@cbook.deprecated('2.2')
 def center_matrix(M, dim=0):
     """
     Return the matrix *M* with each row having zero mean and unit std.
@@ -1797,6 +1793,7 @@ def center_matrix(M, dim=0):
     return M
 
 
+@cbook.deprecated('2.2', 'scipy.integrate.ode')
 def rk4(derivs, y0, t):
     """
     Integrate 1D or ND system of ODEs using 4-th order Runge-Kutta.
@@ -1868,6 +1865,7 @@ def rk4(derivs, y0, t):
     return yout
 
 
+@cbook.deprecated('2.2')
 def bivariate_normal(X, Y, sigmax=1.0, sigmay=1.0,
                      mux=0.0, muy=0.0, sigmaxy=0.0):
     """
@@ -1886,6 +1884,7 @@ def bivariate_normal(X, Y, sigmax=1.0, sigmay=1.0,
     return np.exp(-z/(2*(1-rho**2))) / denom
 
 
+@cbook.deprecated('2.2')
 def get_xyz_where(Z, Cond):
     """
     *Z* and *Cond* are *M* x *N* matrices.  *Z* are data and *Cond* is
@@ -1898,6 +1897,7 @@ def get_xyz_where(Z, Cond):
     return X[Cond], Y[Cond], Z[Cond]
 
 
+@cbook.deprecated('2.2')
 def get_sparse_matrix(M, N, frac=0.1):
     """
     Return a *M* x *N* sparse matrix with *frac* elements randomly
@@ -1911,6 +1911,7 @@ def get_sparse_matrix(M, N, frac=0.1):
     return data
 
 
+@cbook.deprecated('2.2', 'numpy.hypot')
 def dist(x, y):
     """
     Return the distance between two points.
@@ -1919,6 +1920,7 @@ def dist(x, y):
     return np.sqrt(np.dot(d, d))
 
 
+@cbook.deprecated('2.2')
 def dist_point_to_segment(p, s0, s1):
     """
     Get the distance of a point to a segment.
@@ -1947,6 +1949,7 @@ def dist_point_to_segment(p, s0, s1):
     return dist(p, pb)
 
 
+@cbook.deprecated('2.2')
 def segments_intersect(s1, s2):
     """
     Return *True* if *s1* and *s2* intersect.
@@ -1973,6 +1976,7 @@ def segments_intersect(s1, s2):
     return 0.0 <= u1 <= 1.0 and 0.0 <= u2 <= 1.0
 
 
+@cbook.deprecated('2.2')
 def fftsurr(x, detrend=detrend_none, window=window_none):
     """
     Compute an FFT phase randomized surrogate of *x*.
@@ -1988,6 +1992,7 @@ def fftsurr(x, detrend=detrend_none, window=window_none):
     return np.fft.ifft(z).real
 
 
+@cbook.deprecated('2.2')
 def movavg(x, n):
     """
     Compute the len(*n*) moving average of *x*.
@@ -2048,6 +2053,7 @@ exp_safe_MIN = math.log(2.2250738585072014e-308)
 exp_safe_MAX = 1.7976931348623157e+308
 
 
+@cbook.deprecated("2.2", 'numpy.exp')
 def exp_safe(x):
     """
     Compute exponentials which safely underflow to zero.
@@ -2063,6 +2069,7 @@ def exp_safe(x):
         return math.exp(x)
 
 
+@cbook.deprecated("2.2", alternative='numpy.array(list(map(...)))')
 def amap(fn, *args):
     """
     amap(function, sequence[, sequence, ...]) -> array.
@@ -2073,6 +2080,7 @@ def amap(fn, *args):
     return np.array(list(map(fn, *args)))
 
 
+@cbook.deprecated("2.2")
 def rms_flat(a):
     """
     Return the root mean square of all the elements of *a*, flattened out.
@@ -2080,6 +2088,7 @@ def rms_flat(a):
     return np.sqrt(np.mean(np.abs(a) ** 2))
 
 
+@cbook.deprecated("2.2", alternative='numpy.linalg.norm(a, ord=1)')
 def l1norm(a):
     """
     Return the *l1* norm of *a*, flattened out.
@@ -2089,6 +2098,7 @@ def l1norm(a):
     return np.sum(np.abs(a))
 
 
+@cbook.deprecated("2.2", alternative='numpy.linalg.norm(a, ord=2)')
 def l2norm(a):
     """
     Return the *l2* norm of *a*, flattened out.
@@ -2098,6 +2108,7 @@ def l2norm(a):
     return np.sqrt(np.sum(np.abs(a) ** 2))
 
 
+@cbook.deprecated("2.2", alternative='numpy.linalg.norm(a.flat, ord=p)')
 def norm_flat(a, p=2):
     """
     norm(a,p=2) -> l-p norm of a.flat
@@ -2115,6 +2126,7 @@ def norm_flat(a, p=2):
         return np.sum(np.abs(a) ** p) ** (1 / p)
 
 
+@cbook.deprecated("2.2", 'numpy.arange')
 def frange(xini, xfin=None, delta=None, **kw):
     """
     frange([start,] stop[, step, keywords]) -> array of floats
@@ -2182,6 +2194,7 @@ def frange(xini, xfin=None, delta=None, **kw):
 # end frange()
 
 
+@cbook.deprecated("2.2", 'numpy.identity')
 def identity(n, rank=2, dtype='l', typecode=None):
     """
     Returns the identity matrix of shape (*n*, *n*, ..., *n*) (rank *r*).
@@ -2208,6 +2221,7 @@ def identity(n, rank=2, dtype='l', typecode=None):
     return iden
 
 
+@cbook.deprecated("2.2")
 def base_repr(number, base=2, padding=0):
     """
     Return the representation of a *number* in any given *base*.
@@ -2223,6 +2237,7 @@ def base_repr(number, base=2, padding=0):
                       max(padding - 1, max_exponent)))
 
 
+@cbook.deprecated("2.2")
 def binary_repr(number, max_length=1025):
     """
     Return the binary representation of the input *number* as a
@@ -2245,6 +2260,7 @@ def binary_repr(number, max_length=1025):
     return ''.join(map(repr, digits)).replace('L', '')
 
 
+@cbook.deprecated("2.2", 'numpy.log2')
 def log2(x, ln2=math.log(2.0)):
     """
     Return the log(*x*) in base 2.
@@ -2263,6 +2279,7 @@ def log2(x, ln2=math.log(2.0)):
             return len(bin_n)
 
 
+@cbook.deprecated("2.2")
 def ispower2(n):
     """
     Returns the log base 2 of *n* if *n* is a power of 2, zero otherwise.
@@ -2277,6 +2294,7 @@ def ispower2(n):
         return len(bin_n)
 
 
+@cbook.deprecated("2.2")
 def isvector(X):
     """
     Like the MATLAB function with the same name, returns *True*
@@ -2293,7 +2311,7 @@ def isvector(X):
 
 
 # helpers for loading, saving, manipulating and viewing numpy record arrays
-
+@cbook.deprecated("2.2", 'numpy.isnan')
 def safe_isnan(x):
     ':func:`numpy.isnan` for arbitrary types'
     if isinstance(x, six.string_types):
@@ -2308,6 +2326,7 @@ def safe_isnan(x):
         return b
 
 
+@cbook.deprecated("2.2", 'numpy.isinf')
 def safe_isinf(x):
     ':func:`numpy.isinf` for arbitrary types'
     if isinstance(x, six.string_types):
@@ -2322,6 +2341,7 @@ def safe_isinf(x):
         return b
 
 
+@cbook.deprecated("2.2")
 def rec_append_fields(rec, names, arrs, dtypes=None):
     """
     Return a new record array with field names populated with data
@@ -2358,6 +2378,7 @@ def rec_append_fields(rec, names, arrs, dtypes=None):
     return newrec
 
 
+@cbook.deprecated("2.2")
 def rec_drop_fields(rec, names):
     """
     Return a new numpy record array with fields in *names* dropped.
@@ -2375,6 +2396,7 @@ def rec_drop_fields(rec, names):
     return newrec
 
 
+@cbook.deprecated("2.2")
 def rec_keep_fields(rec, names):
     """
     Return a new numpy record array with only fields listed in names
@@ -2390,6 +2412,7 @@ def rec_keep_fields(rec, names):
     return np.rec.fromarrays(arrays, names=names)
 
 
+@cbook.deprecated("2.2")
 def rec_groupby(r, groupby, stats):
     """
     *r* is a numpy record array
@@ -2433,6 +2456,7 @@ def rec_groupby(r, groupby, stats):
     return np.rec.fromrecords(rows, names=names)
 
 
+@cbook.deprecated("2.2")
 def rec_summarize(r, summaryfuncs):
     """
     *r* is a numpy record array
@@ -2455,6 +2479,7 @@ def rec_summarize(r, summaryfuncs):
     return np.rec.fromarrays(arrays, names=names)
 
 
+@cbook.deprecated("2.2")
 def rec_join(key, r1, r2, jointype='inner', defaults=None, r1postfix='1',
              r2postfix='2'):
     """
@@ -2598,6 +2623,7 @@ def rec_join(key, r1, r2, jointype='inner', defaults=None, r1postfix='1',
     return newrec
 
 
+@cbook.deprecated("2.2")
 def recs_join(key, name, recs, jointype='outer', missing=0., postfixes=None):
     """
     Join a sequence of record arrays on single column key.
@@ -2656,6 +2682,7 @@ def recs_join(key, name, recs, jointype='outer', missing=0., postfixes=None):
     return np.rec.fromrecords(results, names=names)
 
 
+@cbook.deprecated("2.2")
 def csv2rec(fname, comments='#', skiprows=0, checkrows=0, delimiter=',',
             converterd=None, names=None, missing='', missingd=None,
             use_mrecords=False, dayfirst=False, yearfirst=False):
@@ -2867,7 +2894,7 @@ def csv2rec(fname, comments='#', skiprows=0, checkrows=0, delimiter=',',
             break
 
         # remove these chars
-        delete = set(r"""~!@#$%^&*()-=+~\|]}[{';: /?.>,<""")
+        delete = set(r"""~!@#$%^&*()-=+~\|}[]{';: /?.>,<""")
         delete.add('"')
 
         names = []
@@ -2937,6 +2964,7 @@ def csv2rec(fname, comments='#', skiprows=0, checkrows=0, delimiter=',',
 
 
 # a series of classes for describing the format intentions of various rec views
+@cbook.deprecated("2.2")
 class FormatObj(object):
     def tostr(self, x):
         return self.toval(x)
@@ -2955,12 +2983,14 @@ class FormatObj(object):
         return hash(self.__class__)
 
 
+@cbook.deprecated("2.2")
 class FormatString(FormatObj):
     def tostr(self, x):
         val = repr(x)
         return val[1:-1]
 
 
+@cbook.deprecated("2.2")
 class FormatFormatStr(FormatObj):
     def __init__(self, fmt):
         self.fmt = fmt
@@ -2971,6 +3001,7 @@ class FormatFormatStr(FormatObj):
         return self.fmt % self.toval(x)
 
 
+@cbook.deprecated("2.2")
 class FormatFloat(FormatFormatStr):
     def __init__(self, precision=4, scale=1.):
         FormatFormatStr.__init__(self, '%%1.%df' % precision)
@@ -2989,6 +3020,7 @@ class FormatFloat(FormatFormatStr):
         return float(s)/self.scale
 
 
+@cbook.deprecated("2.2")
 class FormatInt(FormatObj):
 
     def tostr(self, x):
@@ -3001,6 +3033,7 @@ class FormatInt(FormatObj):
         return int(s)
 
 
+@cbook.deprecated("2.2")
 class FormatBool(FormatObj):
     def toval(self, x):
         return str(x)
@@ -3009,21 +3042,25 @@ class FormatBool(FormatObj):
         return bool(s)
 
 
+@cbook.deprecated("2.2")
 class FormatPercent(FormatFloat):
     def __init__(self, precision=4):
         FormatFloat.__init__(self, precision, scale=100.)
 
 
+@cbook.deprecated("2.2")
 class FormatThousands(FormatFloat):
     def __init__(self, precision=4):
         FormatFloat.__init__(self, precision, scale=1e-3)
 
 
+@cbook.deprecated("2.2")
 class FormatMillions(FormatFloat):
     def __init__(self, precision=4):
         FormatFloat.__init__(self, precision, scale=1e-6)
 
 
+@cbook.deprecated("2.2", alternative='date.strftime')
 class FormatDate(FormatObj):
     def __init__(self, fmt):
         self.fmt = fmt
@@ -3041,6 +3078,7 @@ class FormatDate(FormatObj):
         return dateutil.parser.parse(x).date()
 
 
+@cbook.deprecated("2.2", alternative='datetime.strftime')
 class FormatDatetime(FormatDate):
     def __init__(self, fmt='%Y-%m-%d %H:%M:%S'):
         FormatDate.__init__(self, fmt)
@@ -3050,20 +3088,19 @@ class FormatDatetime(FormatDate):
         return dateutil.parser.parse(x)
 
 
-defaultformatd = {
-    np.bool_:   FormatBool(),
-    np.int16:   FormatInt(),
-    np.int32:   FormatInt(),
-    np.int64:   FormatInt(),
-    np.float32: FormatFloat(),
-    np.float64: FormatFloat(),
-    np.object_: FormatObj(),
-    np.string_: FormatString(),
-    }
-
-
+@cbook.deprecated("2.2")
 def get_formatd(r, formatd=None):
     'build a formatd guaranteed to have a key for every dtype name'
+    defaultformatd = {
+        np.bool_: FormatBool(),
+        np.int16: FormatInt(),
+        np.int32: FormatInt(),
+        np.int64: FormatInt(),
+        np.float32: FormatFloat(),
+        np.float64: FormatFloat(),
+        np.object_: FormatObj(),
+        np.string_: FormatString()}
+
     if formatd is None:
         formatd = dict()
 
@@ -3076,6 +3113,7 @@ def get_formatd(r, formatd=None):
     return formatd
 
 
+@cbook.deprecated("2.2")
 def csvformat_factory(format):
     format = copy.deepcopy(format)
     if isinstance(format, FormatFloat):
@@ -3084,6 +3122,7 @@ def csvformat_factory(format):
     return format
 
 
+@cbook.deprecated("2.2", alternative='numpy.recarray.tofile')
 def rec2txt(r, header=None, padding=3, precision=3, fields=None):
     """
     Returns a textual representation of a record array.
@@ -3204,6 +3243,7 @@ def rec2txt(r, header=None, padding=3, precision=3, fields=None):
     return text
 
 
+@cbook.deprecated("2.2", alternative='numpy.recarray.tofile')
 def rec2csv(r, fname, delimiter=',', formatd=None, missing='',
             missingd=None, withheader=True):
     """
@@ -3275,9 +3315,10 @@ def rec2csv(r, fname, delimiter=',', formatd=None, missing='',
         fh.close()
 
 
+@cbook.deprecated('2.2')
 def griddata(x, y, z, xi, yi, interp='nn'):
-    """Interpolates from a nonuniformly spaced grid to some other
-    grid.
+    """
+    Interpolates from a nonuniformly spaced grid to some other grid.
 
     Fits a surface of the form z = f(`x`, `y`) to the data in the
     (usually) nonuniformly spaced vectors (`x`, `y`, `z`), then
@@ -3403,7 +3444,7 @@ def griddata(x, y, z, xi, yi, interp='nn'):
 ##################################################
 # Linear interpolation algorithms
 ##################################################
-@cbook.deprecated("2.2", alternative="np.interp")
+@cbook.deprecated("2.2", alternative="numpy.interp")
 def less_simple_linear_interpolation(x, y, xi, extrap=False):
     """
     This function provides simple (but somewhat less so than
@@ -3444,6 +3485,7 @@ def less_simple_linear_interpolation(x, y, xi, extrap=False):
     return yi
 
 
+@cbook.deprecated("2.2")
 def slopes(x, y):
     """
     :func:`slopes` calculates the slope *y*'(*x*)
@@ -3485,6 +3527,7 @@ def slopes(x, y):
     return yp
 
 
+@cbook.deprecated("2.2")
 def stineman_interp(xi, x, y, yp=None):
     """
     Given data vectors *x* and *y*, the slope vector *yp* and a new
@@ -3738,6 +3781,7 @@ class GaussianKDE(object):
 ##################################################
 # Code related to things in and around polygons
 ##################################################
+@cbook.deprecated("2.2")
 def inside_poly(points, verts):
     """
     *points* is a sequence of *x*, *y* points.
@@ -3753,6 +3797,7 @@ def inside_poly(points, verts):
     return [idx for idx, p in enumerate(points) if poly.contains_point(p)]
 
 
+@cbook.deprecated("2.2")
 def poly_below(xmin, xs, ys):
     """
     Given a sequence of *xs* and *ys*, return the vertices of a
@@ -3783,6 +3828,7 @@ def poly_below(xmin, xs, ys):
     return x, y
 
 
+@cbook.deprecated("2.2")
 def poly_between(x, ylower, yupper):
     """
     Given a sequence of *x*, *ylower* and *yupper*, return the polygon
@@ -3810,6 +3856,7 @@ def poly_between(x, ylower, yupper):
     return x, y
 
 
+@cbook.deprecated('2.2')
 def is_closed_polygon(X):
     """
     Tests whether first and last object in a sequence are the same.  These are
@@ -3819,32 +3866,16 @@ def is_closed_polygon(X):
     return np.all(X[0] == X[-1])
 
 
+@cbook.deprecated("2.2", message='Moved to matplotlib.cbook')
 def contiguous_regions(mask):
     """
     return a list of (ind0, ind1) such that mask[ind0:ind1].all() is
     True and we cover all such regions
     """
-    mask = np.asarray(mask, dtype=bool)
-
-    if not mask.size:
-        return []
-
-    # Find the indices of region changes, and correct offset
-    idx, = np.nonzero(mask[:-1] != mask[1:])
-    idx += 1
-
-    # List operations are faster for moderately sized arrays
-    idx = idx.tolist()
-
-    # Add first and/or last index if needed
-    if mask[0]:
-        idx = [0] + idx
-    if mask[-1]:
-        idx.append(len(mask))
-
-    return list(zip(idx[::2], idx[1::2]))
+    return cbook.contiguous_regions(mask)
 
 
+@cbook.deprecated("2.2")
 def cross_from_below(x, threshold):
     """
     return the indices into *x* where *x* crosses some threshold from
@@ -3886,6 +3917,7 @@ def cross_from_below(x, threshold):
         return ind
 
 
+@cbook.deprecated("2.2")
 def cross_from_above(x, threshold):
     """
     return the indices into *x* where *x* crosses some threshold from
@@ -3909,6 +3941,7 @@ def cross_from_above(x, threshold):
 ##################################################
 # Vector and path length geometry calculations
 ##################################################
+@cbook.deprecated('2.2')
 def vector_lengths(X, P=2., axis=None):
     """
     Finds the length of a set of vectors in *n* dimensions.  This is
@@ -3923,6 +3956,7 @@ def vector_lengths(X, P=2., axis=None):
     return (np.sum(X**(P), axis=axis))**(1./P)
 
 
+@cbook.deprecated('2.2')
 def distances_along_curve(X):
     """
     Computes the distance between a set of successive points in *N* dimensions.
@@ -3935,6 +3969,7 @@ def distances_along_curve(X):
     return vector_lengths(X, axis=1)
 
 
+@cbook.deprecated('2.2')
 def path_length(X):
     """
     Computes the distance travelled along a polygonal curve in *N* dimensions.
@@ -3947,6 +3982,7 @@ def path_length(X):
     return np.concatenate((np.zeros(1), np.cumsum(X)))
 
 
+@cbook.deprecated('2.2')
 def quad2cubic(q0x, q0y, q1x, q1y, q2x, q2y):
     """
     Converts a quadratic Bezier curve to a cubic approximation.
@@ -3964,6 +4000,7 @@ def quad2cubic(q0x, q0y, q1x, q1y, q2x, q2y):
     return q0x, q0y, c1x, c1y, c2x, c2y, q2x, q2y
 
 
+@cbook.deprecated("2.2")
 def offset_line(y, yerr):
     """
     Offsets an array *y* by +/- an error and returns a tuple

@@ -19,7 +19,6 @@ from six.moves import zip
 import numpy as np
 from matplotlib import rcParams
 
-from .mlab import dist
 from .patches import Circle, Rectangle, Ellipse
 from .lines import Line2D
 from .transforms import blended_transform_factory
@@ -572,20 +571,13 @@ class CheckButtons(AxesWidget):
         self.observers = {}
 
     def _clicked(self, event):
-        if self.ignore(event):
+        if self.ignore(event) or event.button != 1 or event.inaxes != self.ax:
             return
-        if event.button != 1:
-            return
-        if event.inaxes != self.ax:
-            return
-
         for i, (p, t) in enumerate(zip(self.rectangles, self.labels)):
             if (t.get_window_extent().contains(event.x, event.y) or
                     p.get_window_extent().contains(event.x, event.y)):
                 self.set_active(i)
                 break
-        else:
-            return
 
     def set_active(self, index):
         """
@@ -1021,25 +1013,15 @@ class RadioButtons(AxesWidget):
         self.observers = {}
 
     def _clicked(self, event):
-        if self.ignore(event):
-            return
-        if event.button != 1:
-            return
-        if event.inaxes != self.ax:
+        if self.ignore(event) or event.button != 1 or event.inaxes != self.ax:
             return
         xy = self.ax.transAxes.inverted().transform_point((event.x, event.y))
         pclicked = np.array([xy[0], xy[1]])
-
-        def inside(p):
-            pcirc = np.array([p.center[0], p.center[1]])
-            return dist(pclicked, pcirc) < p.radius
-
         for i, (p, t) in enumerate(zip(self.circles, self.labels)):
-            if t.get_window_extent().contains(event.x, event.y) or inside(p):
+            if (t.get_window_extent().contains(event.x, event.y)
+                    or np.linalg.norm(pclicked - p.center) < p.radius):
                 self.set_active(i)
                 break
-        else:
-            return
 
     def set_active(self, index):
         """

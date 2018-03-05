@@ -7,10 +7,8 @@ An example of how to use wxagg in an application with the new
 toolbar - comment out the add_toolbar line for no toolbar
 """
 
-import matplotlib
-matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
-from matplotlib.backends.backend_wx import NavigationToolbar2Wx
+from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar
 from matplotlib.figure import Figure
 
 import numpy as np
@@ -40,7 +38,7 @@ class CanvasFrame(wx.Frame):
         self.add_toolbar()  # comment this out for no toolbar
 
     def add_toolbar(self):
-        self.toolbar = NavigationToolbar2Wx(self.canvas)
+        self.toolbar = NavigationToolbar(self.canvas)
         self.toolbar.Realize()
         # By adding toolbar in sizer, we are able to put it at the bottom
         # of the frame - so appearance is closer to GTK version.

@@ -13,7 +13,7 @@ from numpy import ma
 from numpy.testing import assert_array_equal
 
 from matplotlib import (
-    colors, image as mimage, mlab, patches, pyplot as plt,
+    colors, image as mimage, patches, pyplot as plt,
     rc_context, rcParams)
 from matplotlib.image import (AxesImage, BboxImage, FigureImage,
                               NonUniformImage, PcolorImage)
@@ -512,6 +512,18 @@ def test_nonuniformimage_setnorm():
 
 
 @needs_pillow
+def test_jpeg_2d():
+    # smoke test that mode-L pillow images work.
+    imd = np.ones((10, 10), dtype='uint8')
+    for i in range(10):
+        imd[i, :] = np.linspace(0.0, 1.0, 10) * 255
+    im = Image.new('L', (10, 10))
+    im.putdata(imd.flatten())
+    fig, ax = plt.subplots()
+    ax.imshow(im)
+
+
+@needs_pillow
 def test_jpeg_alpha():
     plt.figure(figsize=(1, 1), dpi=300)
     # Create an image that is all black, with a gradient from 0-1 in
@@ -620,7 +632,7 @@ def test_minimized_rasterized():
 def test_load_from_url():
     req = six.moves.urllib.request.urlopen(
         "http://matplotlib.org/_static/logo_sidebar_horiz.png")
-    Z = plt.imread(req)
+    plt.imread(req)
 
 
 @image_comparison(baseline_images=['log_scale_image'],
@@ -644,8 +656,9 @@ def test_rotate_image():
     delta = 0.25
     x = y = np.arange(-3.0, 3.0, delta)
     X, Y = np.meshgrid(x, y)
-    Z1 = mlab.bivariate_normal(X, Y, 1.0, 1.0, 0.0, 0.0)
-    Z2 = mlab.bivariate_normal(X, Y, 1.5, 0.5, 1, 1)
+    Z1 = np.exp(-(X**2 + Y**2) / 2) / (2 * np.pi)
+    Z2 = (np.exp(-(((X - 1) / 1.5)**2 + ((Y - 1) / 0.5)**2) / 2) /
+          (2 * np.pi * 0.5 * 1.5))
     Z = Z2 - Z1  # difference of Gaussians
 
     fig, ax1 = plt.subplots(1, 1)
@@ -706,8 +719,9 @@ def test_mask_image_over_under():
     delta = 0.025
     x = y = np.arange(-3.0, 3.0, delta)
     X, Y = np.meshgrid(x, y)
-    Z1 = mlab.bivariate_normal(X, Y, 1.0, 1.0, 0.0, 0.0)
-    Z2 = mlab.bivariate_normal(X, Y, 1.5, 0.5, 1, 1)
+    Z1 = np.exp(-(X**2 + Y**2) / 2) / (2 * np.pi)
+    Z2 = (np.exp(-(((X - 1) / 1.5)**2 + ((Y - 1) / 0.5)**2) / 2) /
+          (2 * np.pi * 0.5 * 1.5))
     Z = 10*(Z2 - Z1)  # difference of Gaussians
 
     palette = copy(plt.cm.gray)
@@ -813,6 +827,27 @@ def test_imshow_no_warn_invalid():
     assert len(warns) == 0
 
 
+@pytest.mark.parametrize(
+    'dtype', [np.dtype(s) for s in 'u2 u4 i2 i4 i8 f4 f8'.split()])
+def test_imshow_clips_rgb_to_valid_range(dtype):
+    arr = np.arange(300, dtype=dtype).reshape((10, 10, 3))
+    if dtype.kind != 'u':
+        arr -= 10
+    too_low = arr < 0
+    too_high = arr > 255
+    if dtype.kind == 'f':
+        arr = arr / 255
+    _, ax = plt.subplots()
+    out = ax.imshow(arr).get_array()
+    assert (out[too_low] == 0).all()
+    if dtype.kind == 'f':
+        assert (out[too_high] == 1).all()
+        assert out.dtype.kind == 'f'
+    else:
+        assert (out[too_high] == 255).all()
+        assert out.dtype == np.uint8
+
+
 @image_comparison(baseline_images=['imshow_flatfield'],
                   remove_text=True, style='mpl20',
                   extensions=['png'])
@@ -832,7 +867,18 @@ def test_imshow_bignumbers():
     img = np.array([[1, 2, 1e12],[3, 1, 4]], dtype=np.uint64)
     pc = ax.imshow(img)
     pc.set_clim(0, 5)
-    plt.show()
+
+
+@image_comparison(baseline_images=['imshow_bignumbers_real'],
+                  remove_text=True, style='mpl20',
+                  extensions=['png'])
+def test_imshow_bignumbers_real():
+    # putting a big number in an array of integers shouldn't
+    # ruin the dynamic range of the resolved bits.
+    fig, ax = plt.subplots()
+    img = np.array([[2., 1., 1.e22],[4., 1., 3.]])
+    pc = ax.imshow(img)
+    pc.set_clim(0, 5)
 
 
 @pytest.mark.parametrize(
@@ -862,14 +908,6 @@ def test_imshow_float128():
 def test_imshow_bool():
     fig, ax = plt.subplots()
     ax.imshow(np.array([[True, False], [False, True]], dtype=bool))
-
-
-def test_imshow_deprecated_interd_warn():
-    im = plt.imshow([[1, 2], [3, np.nan]])
-    for k in ('_interpd', '_interpdr', 'iterpnames'):
-        with warnings.catch_warnings(record=True) as warns:
-            getattr(im, k)
-        assert len(warns) == 1
 
 
 def test_full_invalid():
