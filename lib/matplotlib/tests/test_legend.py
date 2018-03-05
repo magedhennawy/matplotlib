@@ -256,6 +256,15 @@ def test_hatching():
     ax.legend(handlelength=4, handleheight=4)
 
 
+@image_comparison(baseline_images=['legend_arrow_annotation'])
+def test_legend_arrow_annotation():
+    # Related to issue 8236
+    # Tests arrow annotations showing up in legend
+    fig, ax = plt.subplots()
+    ax.annotate("foo", (0, 1), xytext=(2, 3), arrowprops={}, label='bar')
+    ax.legend()
+
+
 def test_legend_remove():
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
