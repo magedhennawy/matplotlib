@@ -653,10 +653,14 @@ class HandlerTuple(HandlerBase):
 
 
     width_ratios : tuple, optional
-        The relative width of sections. Must be of length ndivide.
+        Specifies the respective widths of a text/arrow legend annotation pair.
+        Must be of length ndivide.
         If None, all sections will have the same width. Default is None.
+
+
     handlers : tuple, optionnal
-        The list of handlers to call for each section. Must be of length ndivide.
+        The list of handlers to call for each text/arrow legend annotation section.
+        Must be of length ndivide.
         If None, the default handlers will be fetched automatically. Default is None.
     """
     def __init__(self, ndivide=1, pad=None, width_ratios=None, handlers=None, **kwargs):
@@ -708,9 +712,9 @@ class HandlerTuple(HandlerBase):
                 handler = legend.get_legend_handler(handler_map, handle1)
 
             _a_list = handler.create_artists(legend, handle1,
-                                             six.next(xds_cycle),
+                                             next(xds_cycle),
                                              ydescent,
-                                             six.next(widths_cycle),
+                                             next(widths_cycle),
                                              height,
                                              fontsize,
                                              trans)
@@ -829,8 +833,11 @@ class HandlerAnnotation(HandlerText):
     pad : float, optional
         If None, fall back to `legend.borderpad` asstr the default.
         In units of fraction of font size. Default is None.
+
+        
     width_ratios : tuple, optional
-        The relative width of text and arrow sections. Must be of length 2.
+        The relative width of the respective text/arrow legend annotation pair.
+        Must be of length 2.
         Default is [1,4].
     """
     def __init__(self, pad=None, width_ratios=[1,4], **kwargs):
