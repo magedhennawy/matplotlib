@@ -24,6 +24,7 @@ import locale
 import numbers
 import operator
 import os
+from pathlib import Path
 import re
 import sys
 import time
@@ -1612,44 +1613,6 @@ def violin_stats(X, method, points=100):
     return vpstats
 
 
-class _NestedClassGetter(object):
-    # recipe from http://stackoverflow.com/a/11493777/741316
-    """
-    When called with the containing class as the first argument,
-    and the name of the nested class as the second argument,
-    returns an instance of the nested class.
-    """
-    def __call__(self, containing_class, class_name):
-        nested_class = getattr(containing_class, class_name)
-
-        # make an instance of a simple object (this one will do), for which we
-        # can change the __class__ later on.
-        nested_instance = _NestedClassGetter()
-
-        # set the class of the instance, the __init__ will never be called on
-        # the class but the original state will be set later on by pickle.
-        nested_instance.__class__ = nested_class
-        return nested_instance
-
-
-class _InstanceMethodPickler(object):
-    """
-    Pickle cannot handle instancemethod saving. _InstanceMethodPickler
-    provides a solution to this.
-    """
-    def __init__(self, instancemethod):
-        """Takes an instancemethod as its only argument."""
-        if six.PY3:
-            self.parent_obj = instancemethod.__self__
-            self.instancemethod_name = instancemethod.__func__.__name__
-        else:
-            self.parent_obj = instancemethod.im_self
-            self.instancemethod_name = instancemethod.im_func.__name__
-
-    def get_instancemethod(self):
-        return getattr(self.parent_obj, self.instancemethod_name)
-
-
 def pts_to_prestep(x, *args):
     """
     Convert continuous line to pre-steps.
@@ -1941,6 +1904,7 @@ removing these folders and trying again.
 """
 
 
+@deprecated("3.0")
 class Locked(object):
     """
     Context manager to handle locks.
@@ -1994,6 +1958,40 @@ class Locked(object):
                     os.rmdir(path)
                 except OSError:
                     pass
+
+
+@contextlib.contextmanager
+def _lock_path(path):
+    """
+    Context manager for locking a path.
+
+    Usage::
+
+        with _lock_path(path):
+            ...
+
+    Another thread or process that attempts to lock the same path will wait
+    until this context manager is exited.
+
+    The lock is implemented by creating a temporary file in the parent
+    directory, so that directory must exist and be writable.
+    """
+    path = Path(path)
+    lock_path = path.with_name(path.name + ".matplotlib-lock")
+    retries = 50
+    sleeptime = 0.1
+    for _ in range(retries):
+        try:
+            with lock_path.open("xb"):
+                break
+        except FileExistsError:
+            time.sleep(sleeptime)
+    else:
+        raise TimeoutError(_lockstr.format(lock_path))
+    try:
+        yield
+    finally:
+        lock_path.unlink()
 
 
 def _topmost_artist(
