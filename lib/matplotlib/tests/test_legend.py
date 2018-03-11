@@ -250,14 +250,183 @@ def test_hatching():
     ax.legend(handlelength=4, handleheight=4)
 
 
-@image_comparison(baseline_images=['legend_arrow_annotation'])
+@image_comparison(baseline_images=['legend_annotation_empty'],
+                  extensions=['png'],
+                  style='mpl20')
+def test_legend_empty_annotation():
+    # Related to issue 8236
+    # Tests empty annotations showing up in legend
+    fig, ax = plt.subplots(1)
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    ax.annotate("",
+            xy=(0.1, 0.5),
+            xytext=(0.1, 0.5),
+            label='annotation (empty)')
+    print('aaaaaaaaaaaaaa')
+    ax.legend()
+
+
+@image_comparison(baseline_images=['legend_annotation_text'],
+                  extensions=['png'],
+                  style='mpl20')
+def test_legend_text_annotation():
+    # Related to issue 8236
+    # Tests text annotations showing up in legend
+    fig, ax = plt.subplots(1)
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    my_annotation = ax.annotate("X",
+            xy=(0.1, 0.5),
+            xytext=(0.1, 0.5),
+            color='C2',
+            label='annotation (text, no arrow)')
+    ax.legend(handler_map={my_annotation: HandlerAnnotation(rep_str='Abcde',
+                                                            rep_maxlen=0)})
+
+
+@image_comparison(baseline_images=['legend_annotation_arrow'],
+                  extensions=['png'],
+                  style='mpl20')
 def test_legend_arrow_annotation():
     # Related to issue 8236
     # Tests arrow annotations showing up in legend
-    fig, ax = plt.subplots()
-    ax.annotate("foo", (0, 1), xytext=(2, 3), arrowprops={}, label='bar')
+    fig, ax = plt.subplots(1)
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    ax.plot([0, 1], [0, 0], label='line1')
+    ax.plot([0, 1], [1, 1], label='line2')
+    ax.annotate("",
+            xy=(0.3, 1.0),
+            xytext=(0.3, 0.0),
+            arrowprops={'arrowstyle': '<->', 'color': 'C7'},
+            label='annotation (no text, arrow)')
     ax.legend()
 
+
+@image_comparison(baseline_images=['legend_fancy_arrow'],
+                  extensions=['png'],
+                  style='mpl20')
+def test_legend_fancy_arrow_annotation():
+    # Related to issue 8236
+    # Tests arrow annotations showing up in legend
+    fig, ax = plt.subplots(1)
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    arrpatch = mpatches.FancyArrowPatch([0.5, 0.8], [0.9, 0.9],
+                           arrowstyle='<|-',
+                           mutation_scale=20,
+                           color='C3',
+                           label='arrowpatch')
+    ax.add_patch(arrpatch)
+    ax.legend()
+
+
+@image_comparison(baseline_images=['legend_annotation_arrow_text'],
+                  extensions=['png'],
+                  style='mpl20')
+def test_legend_arrow_text_annotation():
+    # Related to issue 8236
+    # Tests arrow annotations and text showing up in legend
+    fig, ax = plt.subplots(1)
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    ax.annotate("Some long string",
+            xy=(0.4, 1.0),
+            xytext=(0.35, 0.1),
+            arrowprops={'arrowstyle': '->', 'color': 'C2'},
+            color='C1',
+            label='annotation (text + arrow)')
+    ax.legend()
+
+
+@image_comparison(baseline_images=['legend_text'],
+                  extensions=['png'],
+                  style='mpl20')
+def test_legend_text():
+    # Related to issue 8236
+    # Tests text showing up in legend
+    fig, ax = plt.subplots(1)
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    ax.text(x=0.1, y=0.1,
+        s='Hello',
+        color='C5',
+        label='text')
+    ax.legend()
+
+
+@image_comparison(baseline_images=['legend_short_text'],
+                  extensions=['png'],
+                  style='mpl20')
+def test_legend_short_text():
+    # Related to issue 8236
+    # Tests short text showing up in legend
+    fig, ax = plt.subplots()
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    ax.text(x=0.1, y=0.2,
+        s='Z',
+        color='C0',
+        label='short text')
+    ax.legend()
+
+
+@image_comparison(baseline_images=['legend_all_annotation_text'],
+                  extensions=['png'],
+                  style='mpl20')
+def test_legend_all_annotation():
+    # Related to issue 8236
+    # Tests all annotations and text in legend
+    fig, ax = plt.subplots(1)
+    ax.plot([0, 1], [0, 0], label='line1')
+    ax.plot([0, 1], [1, 1], label='line2')
+    ax.set_xticklabels('')
+    ax.set_yticklabels('')
+    # no text, no arrow
+    ax.annotate("",
+                xy=(0.1, 0.5),
+                xytext=(0.1, 0.5),
+                label='annotation (empty)')
+    # text, no arrow
+    my_annotation = ax.annotate("X",
+                xy=(0.1, 0.5),
+                xytext=(0.1, 0.5),
+                color='C2',
+                label='annotation (text, no arrow)')
+    # no text, arrow
+    ax.annotate("",
+                xy=(0.3, 1.0),
+                xytext=(0.3, 0.0),
+                arrowprops={'arrowstyle': '<->', 'color': 'C7'},
+                label='annotation (no text, arrow)')
+    # text, arrow
+    ax.annotate("Some long string",
+                xy=(0.4, 1.0),
+                xytext=(0.35, 0.1),
+                arrowprops={'arrowstyle': '->', 'color': 'C2' },
+                color='C1',
+                label='annotation (text + arrow)')
+    # Fancy arrow patch
+    arrpatch = mpatches.FancyArrowPatch([0.5, 0.8], [0.9, 0.9],
+                            arrowstyle='<|-',
+                            mutation_scale=20,
+                            color='C3',
+                            label='arrowpatch')
+    ax.add_patch(arrpatch)
+    # Long text, will not be used in legend
+    ax.text(x=0.1, y=0.1,
+            s='Hello',
+            color='C5',
+            label='text')
+    # Short text, copied in legend
+    ax.text(x=0.1, y=0.2,
+            s='Z',
+            color='C0',
+            label='short text')
+    ax.legend(handler_map={my_annotation: HandlerAnnotation(rep_str='Abcde',
+                                                            rep_maxlen=0)})
+                                                            
 
 def test_legend_remove():
     fig = plt.figure()

@@ -391,7 +391,7 @@ class Legend(Artist):
             corner of the legend in axes coordinates (in which case
             ``bbox_to_anchor`` will be ignored).
 
-        bbox_to_anchor : `~.BboxBase` or pair of floats
+        bbox_to_anchor : `.BboxBase` or pair of floats
             Specify any arbitrary location for the legend in `bbox_transform`
             coordinates (default Axes coordinates).
 
@@ -1122,7 +1122,7 @@ class Legend(Artist):
         self.stale = True
 
     def get_title(self):
-        'Return the `~.Text` instance for the legend title.'
+        'Return the `.Text` instance for the legend title.'
         return self._legend_title_box._text
 
     def get_window_extent(self, *args, **kwargs):
@@ -1158,7 +1158,7 @@ class Legend(Artist):
 
         *bbox* can be
 
-        - A `~.BboxBase` instance
+        - A `.BboxBase` instance
         - A tuple of ``(left, bottom, width, height)`` in the given transform
           (normalized axes coordinate if None)
         - A tuple of ``(left, bottom)`` where the width and height will be
@@ -1275,7 +1275,7 @@ class Legend(Artist):
           * False : turn draggable off
 
         If draggable is on, you can drag the legend on the canvas with
-        the mouse. The `~.DraggableLegend` helper instance is returned if
+        the mouse. The `.DraggableLegend` helper instance is returned if
         draggable is on.
 
         The update parameter control which parameter of the legend changes
