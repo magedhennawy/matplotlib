@@ -59,6 +59,7 @@ class HandlerBase(object):
     width, height) that are scaled by fontsize if necessary.
 
     """
+
     def __init__(self, xpad=0., ypad=0., update_func=None):
         self._xpad, self._ypad = xpad, ypad
         self._update_prop_func = update_func
@@ -111,10 +112,10 @@ class HandlerBase(object):
 
         """
         xdescent, ydescent, width, height = self.adjust_drawing_area(
-                 legend, orig_handle,
-                 handlebox.xdescent, handlebox.ydescent,
-                 handlebox.width, handlebox.height,
-                 fontsize)
+            legend, orig_handle,
+            handlebox.xdescent, handlebox.ydescent,
+            handlebox.width, handlebox.height,
+            fontsize)
         artists = self.create_artists(legend, orig_handle,
                                       xdescent, ydescent, width, height,
                                       fontsize, handlebox.get_transform())
@@ -136,6 +137,7 @@ class HandlerNpoints(HandlerBase):
     """
     A legend handler that shows *numpoints* points in the legend entry.
     """
+
     def __init__(self, marker_pad=0.3, numpoints=None, **kw):
         """
         Parameters
@@ -181,6 +183,7 @@ class HandlerNpointsYoffsets(HandlerNpoints):
     A legend handler that shows *numpoints* in the legend, and allows them to
     be individually offest in the y-direction.
     """
+
     def __init__(self, numpoints=None, yoffsets=None, **kw):
         """
         Parameters
@@ -212,6 +215,7 @@ class HandlerLine2D(HandlerNpoints):
     """
     Handler for `.Line2D` instances.
     """
+
     def __init__(self, marker_pad=0.3, numpoints=None, **kw):
         """
         Parameters
@@ -264,6 +268,7 @@ class HandlerPatch(HandlerBase):
     """
     Handler for `.Patch` instances.
     """
+
     def __init__(self, patch_func=None, **kw):
         """
         Parameters
@@ -310,6 +315,7 @@ class HandlerLineCollection(HandlerLine2D):
     """
     Handler for `.LineCollection` instances.
     """
+
     def get_numpoints(self, legend):
         if self._numpoints is None:
             return legend.scatterpoints
@@ -342,6 +348,7 @@ class HandlerRegularPolyCollection(HandlerNpointsYoffsets):
     """
     Handler for `.RegularPolyCollections`.
     """
+
     def __init__(self, yoffsets=None, sizes=None, **kw):
         HandlerNpointsYoffsets.__init__(self, yoffsets=yoffsets, **kw)
 
@@ -379,7 +386,7 @@ class HandlerRegularPolyCollection(HandlerNpointsYoffsets):
         self._update_prop(legend_handle, orig_handle)
 
         legend_handle.set_figure(legend.figure)
-        #legend._set_artist_props(legend_handle)
+        # legend._set_artist_props(legend_handle)
         legend_handle.set_clip_box(None)
         legend_handle.set_clip_path(None)
 
@@ -417,6 +424,7 @@ class HandlerPathCollection(HandlerRegularPolyCollection):
     """
     Handler for `.PathCollections`, which are used by `~.Axes.scatter`.
     """
+
     def create_collection(self, orig_handle, sizes, offsets, transOffset):
         p = type(orig_handle)([orig_handle.get_paths()[0]],
                               sizes=sizes,
@@ -430,6 +438,7 @@ class HandlerCircleCollection(HandlerRegularPolyCollection):
     """
     Handler for `.CircleCollections`.
     """
+
     def create_collection(self, orig_handle, sizes, offsets, transOffset):
         p = type(orig_handle)(sizes,
                               offsets=offsets,
@@ -442,6 +451,7 @@ class HandlerErrorbar(HandlerLine2D):
     """
     Handler for Errorbars.
     """
+
     def __init__(self, xerr_size=0.5, yerr_size=None,
                  marker_pad=0.3, numpoints=None, **kw):
 
@@ -504,8 +514,8 @@ class HandlerErrorbar(HandlerLine2D):
         handle_caplines = []
 
         if orig_handle.has_xerr:
-            verts = [ ((x - xerr_size, y), (x + xerr_size, y))
-                      for x, y in zip(xdata_marker, ydata_marker)]
+            verts = [((x - xerr_size, y), (x + xerr_size, y))
+                     for x, y in zip(xdata_marker, ydata_marker)]
             coll = mcoll.LineCollection(verts)
             self.update_prop(coll, barlinecols[0], legend)
             handle_barlinecols.append(coll)
@@ -522,8 +532,8 @@ class HandlerErrorbar(HandlerLine2D):
                 handle_caplines.append(capline_right)
 
         if orig_handle.has_yerr:
-            verts = [ ((x, y - yerr_size), (x, y + yerr_size))
-                      for x, y in zip(xdata_marker, ydata_marker)]
+            verts = [((x, y - yerr_size), (x, y + yerr_size))
+                     for x, y in zip(xdata_marker, ydata_marker)]
             coll = mcoll.LineCollection(verts)
             self.update_prop(coll, barlinecols[0], legend)
             handle_barlinecols.append(coll)
@@ -555,6 +565,7 @@ class HandlerStem(HandlerNpointsYoffsets):
     """
     Handler for plots produced by `~.Axes.stem`.
     """
+
     def __init__(self, marker_pad=0.3, numpoints=None,
                  bottom=None, yoffsets=None, **kw):
         """
@@ -663,10 +674,17 @@ class HandlerTuple(HandlerBase):
         Must be of length ndivide.
         If None, the default handlers will be fetched automatically. Default is None.
     """
-    def __init__(self, ndivide=1, pad=None, width_ratios=None, handlers=None, **kwargs):
 
-        self._ndivide  = ndivide
-        self._pad      = pad
+    def __init__(
+            self,
+            ndivide=1,
+            pad=None,
+            width_ratios=None,
+            handlers=None,
+            **kwargs):
+
+        self._ndivide = ndivide
+        self._pad = pad
         self._handlers = handlers
 
         if (width_ratios is not None) and (len(width_ratios) == ndivide):
@@ -701,7 +719,7 @@ class HandlerTuple(HandlerBase):
                       for _ in range(ndivide)]
         widths_cycle = cycle(widths)
 
-        xds = [xdescent - (widths[-i-1] + pad) * i for i in range(ndivide)]
+        xds = [xdescent - (widths[-i - 1] + pad) * i for i in range(ndivide)]
         xds_cycle = cycle(xds)
 
         a_list = []
@@ -727,6 +745,7 @@ class HandlerPolyCollection(HandlerBase):
     """
     Handler for `.PolyCollection` used in `~.Axes.fill_between` and `~.Axes.stackplot`.
     """
+
     def _update_prop(self, legend_handle, orig_handle):
         def first_color(colors):
             if colors is None:
@@ -769,9 +788,10 @@ class HandlerFancyArrowPatch(HandlerPatch):
     """
     Handler for FancyArrowPatch instances.
     """
+
     def _create_patch(self, legend, orig_handle,
                       xdescent, ydescent, width, height, fontsize):
-        arrow = FancyArrowPatch( [-xdescent,
+        arrow = FancyArrowPatch([-xdescent,
                                  -ydescent + height / 2],
                                 [-xdescent + width,
                                  -ydescent + height / 2],
@@ -792,9 +812,10 @@ class HandlerText(HandlerBase):
     rep_maxlen : int, optional
         Maximum length of Text string to be used in the legend. Default is 2.
     """
+
     def __init__(self, rep_str='Aa', rep_maxlen=2, **kwargs):
 
-        self._rep_str    = rep_str
+        self._rep_str = rep_str
         self._rep_maxlen = rep_maxlen
 
         HandlerBase.__init__(self, **kwargs)
@@ -847,7 +868,7 @@ class HandlerAnnotation(HandlerText):
         pad=None,
         width_ratios=[1, 4],
         **kwargs
-        ):
+    ):
 
         self._pad = pad
         self._width_ratios = width_ratios
@@ -864,17 +885,21 @@ class HandlerAnnotation(HandlerText):
         height,
         fontsize,
         trans,
-        ):
+    ):
         if orig_handle.arrow_patch is not None \
-            and orig_handle.get_text() is not '':
+                and orig_handle.get_text() is not '':
 
             # Draw a tuple (text, arrow)
 
-            handler = HandlerTuple(ndivide=2, pad=self._pad,
-                                   width_ratios=self._width_ratios,
-                                   handlers=[HandlerText(rep_str=self._rep_str,
-                                   rep_maxlen=self._rep_maxlen),
-                                   HandlerFancyArrowPatch()])
+            handler = HandlerTuple(
+                ndivide=2,
+                pad=self._pad,
+                width_ratios=self._width_ratios,
+                handlers=[
+                    HandlerText(
+                        rep_str=self._rep_str,
+                        rep_maxlen=self._rep_maxlen),
+                    HandlerFancyArrowPatch()])
 
             # Create a Text instance from annotation text
 
@@ -911,4 +936,4 @@ class HandlerAnnotation(HandlerText):
             height,
             fontsize,
             trans,
-            )
+        )
