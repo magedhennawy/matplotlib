@@ -822,6 +822,7 @@ class HandlerText(HandlerBase):
 
 
 class HandlerAnnotation(HandlerText):
+
     """
     Handler for Annotation instances.
     Defers to HandlerText to draw the annotation text (if any).
@@ -840,39 +841,74 @@ class HandlerAnnotation(HandlerText):
         Must be of length 2.
         Default is [1,4].
     """
-    def __init__(self, pad=None, width_ratios=[1,4], **kwargs):
 
-        self._pad          = pad
+    def __init__(
+        self,
+        pad=None,
+        width_ratios=[1, 4],
+        **kwargs
+        ):
+
+        self._pad = pad
         self._width_ratios = width_ratios
 
         HandlerText.__init__(self, **kwargs)
 
-    def create_artists(self, legend, orig_handle,
-                       xdescent, ydescent, width, height, fontsize, trans):
-        if (orig_handle.arrow_patch is not None) and (orig_handle.get_text() is not ""):
+    def create_artists(
+        self,
+        legend,
+        orig_handle,
+        xdescent,
+        ydescent,
+        width,
+        height,
+        fontsize,
+        trans,
+        ):
+        if orig_handle.arrow_patch is not None \
+            and orig_handle.get_text() is not '':
+
             # Draw a tuple (text, arrow)
-            handler = HandlerTuple(ndivide=2, pad=self._pad, width_ratios=self._width_ratios,
-                                    handlers=[HandlerText(rep_str=self._rep_str,
-                                                          rep_maxlen=self._rep_maxlen),
-                                              HandlerFancyArrowPatch()])
+
+            handler = HandlerTuple(ndivide=2, pad=self._pad,
+                                   width_ratios=self._width_ratios,
+                                   handlers=[HandlerText(rep_str=self._rep_str,
+                                   rep_maxlen=self._rep_maxlen),
+                                   HandlerFancyArrowPatch()])
+
             # Create a Text instance from annotation text
+
             text_handle = Text(text=orig_handle.get_text())
             text_handle.update_from(orig_handle)
-            handle  = (text_handle, orig_handle.arrow_patch)
+            handle = (text_handle, orig_handle.arrow_patch)
         elif orig_handle.arrow_patch is not None:
-            # Arrow without text
-            handler = HandlerFancyArrowPatch()
-            handle  = orig_handle.arrow_patch
-        elif orig_handle.get_text() is not "":
-            # Text without arrow
-            handler = HandlerText(rep_str=self._rep_str, rep_maxlen=self._rep_maxlen)
-            handle  = orig_handle
-        else:
-            # No text, no arrow
-            handler = HandlerPatch()
-            handle  = Rectangle(xy=[0, 0], width=0, height=0, color='w', alpha=0.0)
 
-        return handler.create_artists(legend, handle,
-                                       xdescent, ydescent,
-                                       width, height,
-                                       fontsize, trans)
+            # Arrow without text
+
+            handler = HandlerFancyArrowPatch()
+            handle = orig_handle.arrow_patch
+        elif orig_handle.get_text() is not '':
+
+            # Text without arrow
+
+            handler = HandlerText(rep_str=self._rep_str,
+                                  rep_maxlen=self._rep_maxlen)
+            handle = orig_handle
+        else:
+
+            # No text, no arrow
+
+            handler = HandlerPatch()
+            handle = Rectangle(xy=[0, 0], width=0, height=0, color='w',
+                               alpha=0.0)
+
+        return handler.create_artists(
+            legend,
+            handle,
+            xdescent,
+            ydescent,
+            width,
+            height,
+            fontsize,
+            trans,
+            )
