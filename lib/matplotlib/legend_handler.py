@@ -854,7 +854,7 @@ class HandlerAnnotation(HandlerText):
     ----------
     pad : float, optional
         If None, fall back to `legend.borderpad` asstr the default.
-        In units of fraction of font size. 
+        In units of fraction of font size.
         Default is None.
     width_ratios : tuple, optional
         The relative width of the respective text/arrow legend annotation pair.

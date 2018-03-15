@@ -143,7 +143,7 @@ bbox_to_anchor : `.BboxBase` or pair of floats
     For example, to put the legend's upper right hand corner in the
     center of the axes the following keywords can be used::
 
-       loc='upper right', bbox_to_anchor=(0.5, 0.5)
+        loc='upper right', bbox_to_anchor=(0.5, 0.5)
 
 ncol : integer
     The number of columns that the legend has. Default is 1.
@@ -203,6 +203,7 @@ fancybox : None or bool
     :rc:`legend.fancybox`.
 
 shadow : None or bool
+    Control whether to draw a shadow behind the legend.
     Default is ``None``, which will take the value from
     :rc:`legend.shadow`.
 
@@ -270,9 +271,8 @@ borderaxespad : float or None
 columnspacing : float or None
     The spacing between columns.
     Measured in font-size units.
-    Default is ``None``, which will take the value from 
+    Default is ``None``, which will take the value from
     :rc:`legend.columnspacing`.
-
 
 handler_map : dict or None
     The custom dictionary mapping instances or types to a legend
@@ -449,7 +449,6 @@ class Legend(Artist):
             (frame).
             Default is ``None``, which will take the value from
             :rc:`legend.frameon`.
-
 
         fancybox : None or bool
             Control whether round edges should be enabled around the
