@@ -175,7 +175,7 @@ scatteryoffsets : iterable of floats
     The vertical offset (relative to the font size) for the markers
     created for a scatter plot legend entry. 0.0 is at the base the
     legend text, and 1.0 is at the top. To draw all markers at the
-    same height, set to ``[0.5]``. Default ``[0.375, 0.5, 0.3125]``.
+    same height, set to ``[0.5]``. Default is ``[0.375, 0.5, 0.3125]``.
 
 markerscale : None or int or float
     The relative size of legend markers compared with the originally
@@ -430,7 +430,7 @@ class Legend(Artist):
             The vertical offset (relative to the font size) for the markers
             created for a scatter plot legend entry. 0.0 is at the base the
             legend text, and 1.0 is at the top. To draw all markers at the
-            same height, set to ``[0.5]``. Default ``[0.375, 0.5, 0.3125]``.
+            same height, set to ``[0.5]``. Default is ``[0.375, 0.5, 0.3125]``.
 
         markerscale : None or int or float
             The relative size of legend markers compared with the originally
