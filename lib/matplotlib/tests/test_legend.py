@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.transforms as mtransforms
 import matplotlib.collections as mcollections
-from matplotlib.legend_handler import HandlerTuple
+from matplotlib.legend_handler import HandlerTuple, HandlerAnnotation
+import matplotlib.patches as mpatches
 import matplotlib.legend as mlegend
 
 
