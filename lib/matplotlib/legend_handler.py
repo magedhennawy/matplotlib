@@ -843,23 +843,27 @@ class HandlerText(HandlerBase):
 
 
 class HandlerAnnotation(HandlerText):
-
     """
     Handler for Annotation instances.
+
     Defers to HandlerText to draw the annotation text (if any).
     Defers to HandlerFancyArrowPatch to draw the annotation arrow (if any).
     For annotations made of both text and arrow, HandlerTuple is used to draw them side by side.
     Additional kwargs are passed through to `HandlerText`.
+
     Parameters
     ----------
+
     pad : float, optional
         If None, fall back to `legend.borderpad` asstr the default.
-        In units of fraction of font size.
+        In units of fraction of font size. 
         Default is None.
+
     width_ratios : tuple, optional
         The relative width of the respective text/arrow legend annotation pair.
         Must be of length 2.
         Default is [1,4].
+
     """
 
     def __init__(
