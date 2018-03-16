@@ -405,7 +405,7 @@ def test_legend_all_annotation():
     ax.annotate("Some long string",
                 xy=(0.4, 1.0),
                 xytext=(0.35, 0.1),
-                arrowprops={'arrowstyle': '->', 'color': 'C2' },
+                arrowprops={'arrowstyle': '->', 'color': 'C2'},
                 color='C1',
                 label='annotation (text + arrow)')
     # Fancy arrow patch

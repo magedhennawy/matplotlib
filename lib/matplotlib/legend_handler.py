@@ -816,7 +816,7 @@ class HandlerText(HandlerBase):
     rep_maxlen : int, optional
         Maximum length of Text string to be used in the legend. Default is 2.
     """
-    
+
     def __init__(self, rep_str='Aa', rep_maxlen=2, **kwargs):
 
         self._rep_str = rep_str
@@ -854,13 +854,13 @@ class HandlerAnnotation(HandlerText):
     Defers to HandlerFancyArrowPatch to draw the annotation arrow (if any).
     For annotations made of both text and arrow, HandlerTuple is used to draw them side by side.
     Additional kwargs are passed through to `HandlerText`.
-    
+
     Parameters
     ----------
 
     pad : float, optional
         If None, fall back to `legend.borderpad` asstr the default.
-        In units of fraction of font size. 
+        In units of fraction of font size.
         Default is None.
 
     width_ratios : tuple, optional
