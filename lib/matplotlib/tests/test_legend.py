@@ -427,7 +427,7 @@ def test_legend_all_annotation():
             label='short text')
     ax.legend(handler_map={my_annotation: HandlerAnnotation(rep_str='Abcde',
                                                             rep_maxlen=0)})
-                                                            
+
 
 def test_legend_remove():
     fig = plt.figure()
