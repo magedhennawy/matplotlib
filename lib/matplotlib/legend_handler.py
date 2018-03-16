@@ -803,16 +803,20 @@ class HandlerFancyArrowPatch(HandlerPatch):
 class HandlerText(HandlerBase):
     """
     Handler for Text instances.
+
     Additional kwargs are passed through to `HandlerBase`.
+
     Parameters
     ----------
     rep_str : string, optional
         Replacement string used in the legend when the Text string is longer than rep_maxlen.
         Default is 'Aa'.
+
+
     rep_maxlen : int, optional
         Maximum length of Text string to be used in the legend. Default is 2.
     """
-
+    
     def __init__(self, rep_str='Aa', rep_maxlen=2, **kwargs):
 
         self._rep_str = rep_str
@@ -850,7 +854,7 @@ class HandlerAnnotation(HandlerText):
     Defers to HandlerFancyArrowPatch to draw the annotation arrow (if any).
     For annotations made of both text and arrow, HandlerTuple is used to draw them side by side.
     Additional kwargs are passed through to `HandlerText`.
-
+    
     Parameters
     ----------
 
@@ -863,7 +867,6 @@ class HandlerAnnotation(HandlerText):
         The relative width of the respective text/arrow legend annotation pair.
         Must be of length 2.
         Default is [1,4].
-
     """
 
     def __init__(
