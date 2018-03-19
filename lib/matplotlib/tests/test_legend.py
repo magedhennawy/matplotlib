@@ -35,7 +35,7 @@ def test_legend_ordereddict():
 @image_comparison(baseline_images=['legend_auto1'], remove_text=True)
 def test_legend_auto1():
     'Test automatic legend placement'
-        fig = plt.figure()
+    fig = plt.figure()
     ax = fig.add_subplot(111)
     x = np.arange(100)
     ax.plot(x, 50 - x, 'o', label='y=1')
@@ -215,109 +215,6 @@ def test_hatching():
     ax.set_xlim(-0.01, 1.1)
     ax.set_ylim(-0.01, 1.1)
     ax.legend(handlelength=4, handleheight=4)
-
-
-@image_comparison(baseline_images=['legend_annotation_empty'],
-                  extensions=['png'],
-                  style='mpl20')
-def test_legend_empty_annotation():
-    # Related to issue 8236
-    # Tests empty annotations showing up in legend
-    fig, ax = plt.subplots(1)
-    ax.set_xticklabels('')
-    ax.set_yticklabels('')
-    ax.annotate("",
-            xy=(0.1, 0.5),
-            xytext=(0.1, 0.5),
-            label='annotation (empty)')
-    ax.legend()
-
-
-@image_comparison(baseline_images=['legend_annotation_text'],
-                  extensions=['png'],
-                  style='mpl20')
-def test_legend_text_annotation():
-    # Related to issue 8236
-    # Tests text annotations showing up in legend
-    fig, ax = plt.subplots(1)
-    ax.set_xticklabels('')
-    ax.set_yticklabels('')
-    my_annotation = ax.annotate("X",
-            xy=(0.1, 0.5),
-            xytext=(0.1, 0.5),
-            color='C2',
-            label='annotation (text, no arrow)')
-    ax.legend(handler_map={my_annotation: HandlerAnnotation(rep_str='Abcde',
-                                                            rep_maxlen=0)})
-
-
-@image_comparison(baseline_images=['legend_annotation_arrow'],
-                  extensions=['png'],
-                  style='mpl20')
-def test_legend_arrow_annotation():
-    # Related to issue 8236
-    # Tests arrow annotations showing up in legend
-    fig, ax = plt.subplots(1)
-    ax.set_xticklabels('')
-    ax.set_yticklabels('')
-    ax.plot([0, 1], [0, 0], label='line1')
-    ax.plot([0, 1], [1, 1], label='line2')
-    ax.annotate("",
-            xy=(0.3, 1.0),
-            xytext=(0.3, 0.0),
-            arrowprops={'arrowstyle': '<->', 'color': 'C7'},
-            label='annotation (no text, arrow)')
-    ax.legend()
-
-
-@image_comparison(baseline_images=['legend_fancy_arrow'],
-                  extensions=['png'],
-                  style='mpl20')
-def test_legend_fancy_arrow_annotation():
-    # Related to issue 8236
-    # Tests arrow annotations showing up in legend
-    fig, ax = plt.subplots(1)
-    ax.set_xticklabels('')
-    ax.set_yticklabels('')
-    arrpatch = mpatches.FancyArrowPatch([0.5, 0.8], [0.9, 0.9],
-                           arrowstyle='<|-',
-                           mutation_scale=20,
-                           color='C3',
-                           label='arrowpatch')
-    ax.add_patch(arrpatch)
-    ax.legend()
-
-
-@image_comparison(baseline_images=['legend_text'],
-                  extensions=['png'],
-                  style='mpl20')
-def test_legend_text():
-    # Related to issue 8236
-    # Tests text showing up in legend
-    fig, ax = plt.subplots(1)
-    ax.set_xticklabels('')
-    ax.set_yticklabels('')
-    ax.text(x=0.1, y=0.1,
-        s='Hello',
-        color='C5',
-        label='text')
-    ax.legend()
-
-
-@image_comparison(baseline_images=['legend_short_text'],
-                  extensions=['png'],
-                  style='mpl20')
-def test_legend_short_text():
-    # Related to issue 8236
-    # Tests short text showing up in legend
-    fig, ax = plt.subplots()
-    ax.set_xticklabels('')
-    ax.set_yticklabels('')
-    ax.text(x=0.1, y=0.2,
-        s='Z',
-        color='C0',
-        label='short text')
-    ax.legend()
 
 
 @image_comparison(baseline_images=['legend_all_annotation_text'],
