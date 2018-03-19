@@ -288,24 +288,6 @@ def test_legend_fancy_arrow_annotation():
     ax.legend()
 
 
-@image_comparison(baseline_images=['legend_annotation_arrow_text'],
-                  extensions=['png'],
-                  style='mpl20')
-def test_legend_arrow_text_annotation():
-    # Related to issue 8236
-    # Tests arrow annotations and text showing up in legend
-    fig, ax = plt.subplots(1)
-    ax.set_xticklabels('')
-    ax.set_yticklabels('')
-    ax.annotate("Some long string",
-            xy=(0.4, 1.0),
-            xytext=(0.35, 0.1),
-            arrowprops={'arrowstyle': '->', 'color': 'C2'},
-            color='C1',
-            label='annotation (text + arrow)')
-    ax.legend()
-
-
 @image_comparison(baseline_images=['legend_text'],
                   extensions=['png'],
                   style='mpl20')
@@ -366,13 +348,6 @@ def test_legend_all_annotation():
                 xytext=(0.3, 0.0),
                 arrowprops={'arrowstyle': '<->', 'color': 'C7'},
                 label='annotation (no text, arrow)')
-    # text, arrow
-    ax.annotate("Some long string",
-                xy=(0.4, 1.0),
-                xytext=(0.35, 0.1),
-                arrowprops={'arrowstyle': '->', 'color': 'C2'},
-                color='C1',
-                label='annotation (text + arrow)')
     # Fancy arrow patch
     arrpatch = mpatches.FancyArrowPatch([0.5, 0.8], [0.9, 0.9],
                             arrowstyle='<|-',
