@@ -329,8 +329,7 @@ class silent_list(list):
     def __repr__(self):
         return '<a list of %d %s objects>' % (len(self), self.type)
 
-    def __str__(self):
-        return repr(self)
+    __str__ = __repr__
 
     def __getstate__(self):
         # store a dictionary of this SilentList's state
@@ -916,14 +915,14 @@ def print_cycles(objects, outstream=sys.stdout, show_progress=False):
             # next "wraps around"
             next = path[(i + 1) % len(path)]
 
-            outstream.write("   %s -- " % str(type(step)))
+            outstream.write("   %s -- " % type(step))
             if isinstance(step, dict):
                 for key, val in six.iteritems(step):
                     if val is next:
-                        outstream.write("[%s]" % repr(key))
+                        outstream.write("[{!r}]".format(key))
                         break
                     if key is next:
-                        outstream.write("[key] = %s" % repr(val))
+                        outstream.write("[key] = {!r}".format(val))
                         break
             elif isinstance(step, list):
                 outstream.write("[%d]" % step.index(next))
@@ -2022,3 +2021,49 @@ def _str_lower_equal(obj, s):
     cannot be used in a boolean context.
     """
     return isinstance(obj, six.string_types) and obj.lower() == s
+
+
+def _define_aliases(alias_d, cls=None):
+    """Class decorator for defining property aliases.
+
+    Use as ::
+
+        @cbook._define_aliases({"property": ["alias", ...], ...})
+        class C: ...
+
+    For each property, if the corresponding ``get_property`` is defined in the
+    class so far, an alias named ``get_alias`` will be defined; the same will
+    be done for setters.  If neither the getter nor the setter exists, an
+    exception will be raised.
+
+    The alias map is stored as the ``_alias_map`` attribute on the class and
+    can be used by `~.normalize_kwargs` (which assumes that higher priority
+    aliases come last).
+    """
+    if cls is None:
+        return functools.partial(_define_aliases, alias_d)
+
+    def make_alias(name):  # Enforce a closure over *name*.
+        def method(self, *args, **kwargs):
+            return getattr(self, name)(*args, **kwargs)
+        return method
+
+    for prop, aliases in alias_d.items():
+        exists = False
+        for prefix in ["get_", "set_"]:
+            if prefix + prop in vars(cls):
+                exists = True
+                for alias in aliases:
+                    method = make_alias(prefix + prop)
+                    method.__name__ = prefix + alias
+                    method.__doc__ = "alias for `{}`".format(prefix + prop)
+                    setattr(cls, prefix + alias, method)
+        if not exists:
+            raise ValueError(
+                "Neither getter nor setter exists for {!r}".format(prop))
+
+    if hasattr(cls, "_alias_map"):
+        # Need to decide on conflict resolution policy.
+        raise NotImplementedError("Parent class already defines aliases")
+    cls._alias_map = alias_d
+    return cls
