@@ -35,7 +35,7 @@ def test_legend_ordereddict():
 @image_comparison(baseline_images=['legend_auto1'], remove_text=True)
 def test_legend_auto1():
     'Test automatic legend placement'
-        fig = plt.figure()
+    fig = plt.figure()
     ax = fig.add_subplot(111)
     x = np.arange(100)
     ax.plot(x, 50 - x, 'o', label='y=1')
